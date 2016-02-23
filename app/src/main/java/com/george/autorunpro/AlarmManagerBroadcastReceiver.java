@@ -21,6 +21,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
     final public static String ONE_TIME = "onetime";
     Cursor c;
+    String packageName;
     @Override
     public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -29,28 +30,29 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         wl.acquire();
         //You can do the processing here.
         Bundle extras = intent.getExtras();
-        StringBuilder msgStr = new StringBuilder();
+        //StringBuilder msgStr = new StringBuilder();
 
         if(extras != null && extras.getBoolean(ONE_TIME, Boolean.FALSE)){
             //Make sure this intent has been sent by the one-time timer button.
-            msgStr.append("One time Timer : ");
+            //msgStr.append("One time Timer : ");
         }
-        Format formatter = new SimpleDateFormat("hh:mm:ss a");
-        msgStr.append(formatter.format(new Date()));
-
-        Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
+        Format formatter = new SimpleDateFormat("H:m");
+        String time = formatter.format(new Date());
+       // Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
         //running the application
         SqlOperator sqlOperator = new SqlOperator(context);
         try{
          c = sqlOperator.selectRecords();
-        while (c.moveToNext()) {
-         System.out.println(c.getString(c.getColumnIndex("appname")));
-         System.out.println(c.getString(c.getColumnIndex("time")));
-        }}
-        catch (Exception e){Log.i("Cursor exception: ", e.toString());
+            do{
+                System.out.println(c.getString(c.getColumnIndex("appname")));
+                System.out.println(c.getString(c.getColumnIndex("time")));
+                if(c.getString(c.getColumnIndex("time")).equals(time));
+                   packageName = c.getString(c.getColumnIndex("appname"));
             }
-        c.moveToFirst();
-        String packageName = c.getString(c.getColumnIndex("appname"));
+           while (c.moveToNext());
+        }
+        catch (Exception e){    Log.i("Cursor exception: ", e.toString());    }
+
         //
         //String selectQuery = "SELECT lastchapter FROM Bookdetails WHERE bookpath=?";
         //Cursor c = db.rawQuery(selectQuery, new String[] { fileName });

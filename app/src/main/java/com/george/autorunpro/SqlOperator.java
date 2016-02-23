@@ -36,6 +36,7 @@ public class SqlOperator{
 
     public Cursor selectRecords() {
         String[] cols = new String[] {APP_NAME, APP_TIME};
+        //String selectQuery = "SELECT appname FROM AppAlarms WHERE time=?";
         Cursor mCursor = database.query(true, APP_TABLE,cols,null
                 , null, null, null, null, null);
         if (mCursor != null) {

@@ -122,8 +122,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             time = data;
             final SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
             final Date dateObj = sdf.parse(data);
-            System.out.println(dateObj);
-            System.out.println(new SimpleDateFormat("hh:mm aa").format(dateObj));
+            System.out.println("lk"+new SimpleDateFormat("H:m").format(dateObj));
             String time = new SimpleDateFormat("hh:mm aa").format(dateObj).toString();
             et.setText(time);
         }
