@@ -8,13 +8,17 @@ import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.george.autorunpro.activity.TimePickerFragment;
@@ -56,32 +60,17 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                 Toast.makeText(EventAdder.this, et.getText().toString(),Toast.LENGTH_SHORT).show();
             }
         });
-        et.setOnClickListener(new View.OnClickListener() {
+
+        et.setOnTouchListener(new View.OnTouchListener(){
             @Override
-            public void onClick(View v) {
-                showTimePickerDialog(v);
-            }
-
-        });
-        et.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // btn.setAlpha(1f);
-                // btn.setClickable(true);
+            public boolean onTouch(View v, MotionEvent event) {
+                int inType = et.getInputType(); // backup the input type
+                et.setInputType(InputType.TYPE_NULL); // disable soft input
+                et.onTouchEvent(event); // call native handler
+                et.setInputType(inType); // restore input type
+                return true; // consume touch even
             }
         });
-
 
         List<PackageInfo> packageList1 = new ArrayList<PackageInfo>();  //new list to add packages
 
@@ -111,6 +100,27 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
 
 
 
+        });
+        //spinner if required
+        Spinner dynamicSpinner = (Spinner) findViewById(R.id.dynamic_spinner);
+        String[] items = new String[]{"Chai Latte", "Green Tea", "Black Tea"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, items);
+
+        dynamicSpinner.setAdapter(adapter);
+
+        dynamicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                Log.v("item", (String) parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
         });
     }
     /**

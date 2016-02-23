@@ -16,21 +16,25 @@
         android:text="Enter the time:"
         android:layout_height="wrap_content" />
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_time"
+        android:layout_below="@+id/two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:layout_width="match_parent"
-        android:layout_below="@+id/two"
         android:hint="Enter time"
         android:id="@+id/three"
         android:onClick="showTimePickerDialog"
         android:layout_height="wrap_content" />
+    </android.support.design.widget.TextInputLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
         android:id="@+id/timetv"
-
-        android:layout_below="@+id/three" />
+        android:layout_below="@+id/input_layout_time" />
 
     <Button
         android:layout_width="wrap_content"
