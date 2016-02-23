@@ -12,18 +12,11 @@ import java.util.Calendar;
  */
 public class AlarmSet {
 
+    final public static String ONE_TIME = "onetime";
+
     public void SetRepeatAlarm(Context context, Calendar calendar)
     {
-     /*   Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 00);
-        calendar.set(Calendar.SECOND, 00);
-        if(Calendar.getInstance().after(calendar)){
-            // Move to tomorrow
-            calendar.add(Calendar.DATE, 1);
-        }
-*/
+
 
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
@@ -48,21 +41,6 @@ public class AlarmSet {
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
         am.set(AlarmManager.RTC_WAKEUP,  calendar.getTimeInMillis(), pi);
     }
-    /*
-* Date futureDate = new Date(new Date().getTime() + 86400000);
-
-
-    futureDate.setHours(8);
-    futureDate.setMinutes(0);
-    futureDate.setSeconds(0);
-Intent intent = new Intent(con, MyAppReciever.class);
-
-    PendingIntent sender = PendingIntent.getBroadcast(con, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT);
-
-    am.set(AlarmManager.RTC_WAKEUP, futureDate.getTimeInMillis(), sender);
-*
-* */
 
 
 }

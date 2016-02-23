@@ -1,6 +1,9 @@
 package com.george.autorunpro;
 
+import android.app.AlarmManager;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -27,6 +30,7 @@ import com.george.autorunpro.adapter.ApkAdapter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +42,8 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
     EditText et;
     Button btn;
     String time;
+    PackageInfo packageInfo;
+    Context con;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +56,11 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         btn =(Button) findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(EventAdder.this, "button event",Toast.LENGTH_SHORT).show();
-                Toast.makeText(EventAdder.this, et.getText().toString(),Toast.LENGTH_SHORT).show();
+               if( Add_Alarm())
+                 Toast.makeText(EventAdder.this, "Alarm Added",Toast.LENGTH_SHORT).show();
+                else
+                   Toast.makeText(EventAdder.this, "Cannot add alarm!",Toast.LENGTH_SHORT).show();
+                DbAdd(packageInfo.packageName,time);
             }
         });
 
@@ -81,15 +90,9 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                PackageInfo packageInfo =  (PackageInfo) parent.getItemAtPosition(position);
+                packageInfo =  (PackageInfo) parent.getItemAtPosition(position);
                 Log.i("Member name: ", packageInfo.toString());
-               // Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(packageInfo.packageName);
-               // if (launchIntent != null) {
-              //      context.startActivity(launchIntent);
-              //  } else {
-              //      Toast.makeText(context, "Package not found", Toast.LENGTH_SHORT).show();
-              //  }
-              //  startActivity( LaunchIntent );
+
             }
 
             @Override
@@ -116,6 +119,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
     public void onDataPass(String data) {
         Log.d("LOG", "hello " + data);
         try {
+            time = data;
             final SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
             final Date dateObj = sdf.parse(data);
             System.out.println(dateObj);
@@ -126,4 +130,31 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         catch(final ParseException e)
         {e.printStackTrace();}
     }
+    private Boolean Add_Alarm(){
+
+
+        String[] splited = time.split(":");
+        int hour =Integer.parseInt(splited[0]);
+        int min = Integer.parseInt(splited[1]);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, min);
+        calendar.set(Calendar.SECOND, 00);
+        if(Calendar.getInstance().after(calendar)){
+            // Move to tomorrow
+            calendar.add(Calendar.DATE, 1);
+        }
+        AlarmSet as = new AlarmSet();
+        as.setOnetimeTimer(getApplicationContext(),calendar);
+        return true;
+    }
+    private Boolean DbAdd(String name,String time){
+
+        SqlOperator sqlOperator = new SqlOperator(getApplicationContext());
+        sqlOperator.createRecords(name,time);
+        return true;
+    }
 }
+
+

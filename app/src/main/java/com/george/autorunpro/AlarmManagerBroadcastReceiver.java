@@ -10,14 +10,17 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.util.Log;
 import android.widget.Toast;
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
     final public static String ONE_TIME = "onetime";
-
+    Cursor c;
     @Override
     public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -36,7 +39,35 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         msgStr.append(formatter.format(new Date()));
 
         Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
+        //running the application
+        SqlOperator sqlOperator = new SqlOperator(context);
+        try{
+         c = sqlOperator.selectRecords();
+        while (c.moveToNext()) {
+         System.out.println(c.getString(c.getColumnIndex("appname")));
+         System.out.println(c.getString(c.getColumnIndex("time")));
+        }}
+        catch (Exception e){Log.i("Cursor exception: ", e.toString());
+            }
+        c.moveToFirst();
+        String packageName = c.getString(c.getColumnIndex("appname"));
+        //
+        //String selectQuery = "SELECT lastchapter FROM Bookdetails WHERE bookpath=?";
+        //Cursor c = db.rawQuery(selectQuery, new String[] { fileName });
+        //if (c.moveToFirst()) {
+        //    temp_address = c.getString(c.getColumnIndex("lastchapter"));
+        //}
+        //c.close();
+        //
 
+        PackageManager packm = context.getPackageManager();
+         Intent LaunchIntent = packm.getLaunchIntentForPackage(packageName);
+         if (LaunchIntent != null) {
+              context.startActivity(LaunchIntent);
+          } else {
+              Toast.makeText(context, "Application  not found", Toast.LENGTH_SHORT).show();
+          }
+          context.startActivity( LaunchIntent );
         //Release the lock
         wl.release();
     }
