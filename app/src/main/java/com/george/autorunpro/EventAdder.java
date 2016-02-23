@@ -44,16 +44,10 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_adder);
 
-        //app list starts
-        packageManager = getPackageManager();
-        List<PackageInfo> packageList = packageManager
-                .getInstalledPackages(PackageManager.GET_PERMISSIONS);
+
         //Text watcher for the edit text
-        et = (EditText) findViewById(R.id.three);
+        et = (EditText) findViewById(R.id.ettime);
         btn =(Button) findViewById(R.id.btn);
-        //btn.setAlpha(.5f);
-        // btn.setClickable(false);
-        // btn.setEnabled(false);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Toast.makeText(EventAdder.this, "button event",Toast.LENGTH_SHORT).show();
@@ -61,19 +55,11 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             }
         });
 
-        et.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int inType = et.getInputType(); // backup the input type
-                et.setInputType(InputType.TYPE_NULL); // disable soft input
-                et.onTouchEvent(event); // call native handler
-                et.setInputType(inType); // restore input type
-                return true; // consume touch even
-            }
-        });
-
+        //app list starts
+        packageManager = getPackageManager();
+        List<PackageInfo> packageList = packageManager
+                .getInstalledPackages(PackageManager.GET_PERMISSIONS);
         List<PackageInfo> packageList1 = new ArrayList<PackageInfo>();  //new list to add packages
-
         /*To filter out System apps*/
         for (PackageInfo pi : packageList) {
             boolean b = isSystemPackage(pi);
@@ -81,40 +67,29 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                 packageList1.add(pi);
             }
         }
+       /*  int listSize = packageList1.size();
 
-        apkList = (ListView) findViewById(R.id.applist);
+       for (int i = 0; i<listSize; i++){
+            Log.i("Member name: ", packageList1.get(i).toString());
+        }*/
+
+        //spinner
+        Spinner apkList = (Spinner) findViewById(R.id.dynamic_spinner);
         apkList.setAdapter(new ApkAdapter(EventAdder.this, packageList1, packageManager));
-        apkList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long row) {
-                PackageInfo packageInfo = (PackageInfo) parent
-                        .getItemAtPosition(position);
-                AppData appData = (AppData) getApplicationContext();
-                appData.setPackageInfo(packageInfo);
-
-                Intent appInfo = new Intent(getApplicationContext(), ApkInfo.class);
-                startActivity(appInfo);
-            }
-
-
-
-        });
-        //spinner if required
-        Spinner dynamicSpinner = (Spinner) findViewById(R.id.dynamic_spinner);
-        String[] items = new String[]{"Chai Latte", "Green Tea", "Black Tea"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, items);
-
-        dynamicSpinner.setAdapter(adapter);
-
-        dynamicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        apkList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                Log.v("item", (String) parent.getItemAtPosition(position));
+                PackageInfo packageInfo =  (PackageInfo) parent.getItemAtPosition(position);
+                Log.i("Member name: ", packageInfo.toString());
+               // Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(packageInfo.packageName);
+               // if (launchIntent != null) {
+              //      context.startActivity(launchIntent);
+              //  } else {
+              //      Toast.makeText(context, "Package not found", Toast.LENGTH_SHORT).show();
+              //  }
+              //  startActivity( LaunchIntent );
             }
 
             @Override
@@ -123,14 +98,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             }
         });
     }
-    /**
-     * Return whether the given PackgeInfo represents a system package or not.
-     * User-installed packages (Market or otherwise) should not be denoted as
-     * system packages.
-     *
-     * @param pkgInfo
-     * @return boolean
-     */
 
     private boolean isSystemPackage(PackageInfo pkgInfo) {
         return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ? true
