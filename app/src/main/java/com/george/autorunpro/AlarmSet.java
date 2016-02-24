@@ -39,7 +39,7 @@ public class AlarmSet {
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         intent.putExtra("id", req_id);
-        PendingIntent pi = PendingIntent.getBroadcast(context, req_id, intent, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, req_id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.set(AlarmManager.RTC_WAKEUP,  calendar.getTimeInMillis(), pi);
     }
 

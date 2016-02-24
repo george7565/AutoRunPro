@@ -48,12 +48,15 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         try{
          c = sqlOperator.selectRecords();
             do{
-               // System.out.println(c.getString(c.getColumnIndex("appname")));
-               // System.out.println(c.getString(c.getColumnIndex("time")));
-                if(c.getString(c.getColumnIndex("id")).equals(id));
-                   packageName = c.getString(c.getColumnIndex("appname"));
-            }
-           while (c.moveToNext());
+
+                if(c.getInt(c.getColumnIndex("id")) == id ){
+                    System.out.println(c.getString(c.getColumnIndex("appname")));
+                    System.out.println(c.getString(c.getColumnIndex("time")));
+                    packageName = c.getString(c.getColumnIndex("appname"));
+                }
+
+            }while(c.moveToNext());
+
         }
         catch (Exception e){    Log.i("Cursor exception: ", e.toString());    }
 

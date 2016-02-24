@@ -66,12 +66,14 @@ public class SqlOperator{
     public int getLastid(){
 
         int id;
-        Cursor c = database.rawQuery("SELECT * FROM AppAlarms ORDER BY id DESC LIMIT 1;", null);
-        if (c.moveToFirst()) {
-           id = c.getInt(c.getColumnIndex("id"));
+        Cursor c = database.rawQuery("SELECT * FROM AppAlarms ORDER BY id DESC LIMIT 1", null);
+        if(c.moveToFirst()){
+
+            id = c.getInt(c.getColumnIndex("id"));
+            System.out.println("inside getlastid id="+id);
         }
         else
-          id = 0;
+          id = 1;
         c.close();
         return id;
     }
