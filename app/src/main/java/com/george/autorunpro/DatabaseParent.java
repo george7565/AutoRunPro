@@ -16,9 +16,18 @@ public class DatabaseParent extends SQLiteOpenHelper {
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "create table AppAlarms(" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "appname text not null," +
             "time text not null, " +
-            "PRIMARY KEY (appname,time));";
+            "monday int not null," +
+            "tuesday int not null," +
+            "wednesday int not null," +
+            "thursday int not null," +
+            "friday int not null," +
+            "saturday int not null," +
+            "sunday int not null," +
+            "mode int not null," +
+            "status int not null);";
 
     public DatabaseParent(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

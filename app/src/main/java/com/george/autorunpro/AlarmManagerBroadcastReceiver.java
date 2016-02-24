@@ -19,8 +19,9 @@ import android.widget.Toast;
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
-    final public static String ONE_TIME = "onetime";
+    final public static String REQ_ID= "id";
     Cursor c;
+    int id;
     String packageName;
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -29,24 +30,27 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         //Acquire the lock
         wl.acquire();
         //You can do the processing here.
+
         Bundle extras = intent.getExtras();
         //StringBuilder msgStr = new StringBuilder();
 
-        if(extras != null && extras.getBoolean(ONE_TIME, Boolean.FALSE)){
+        if(extras != null )
+           id =  extras.getInt(REQ_ID);
+        System.out.println("Inside reciever id="+id);
             //Make sure this intent has been sent by the one-time timer button.
             //msgStr.append("One time Timer : ");
-        }
-        Format formatter = new SimpleDateFormat("H:m");
-        String time = formatter.format(new Date());
+
+      //  Format formatter = new SimpleDateFormat("H:m");
+       // String time = formatter.format(new Date());
        // Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
         //running the application
         SqlOperator sqlOperator = new SqlOperator(context);
         try{
          c = sqlOperator.selectRecords();
             do{
-                System.out.println(c.getString(c.getColumnIndex("appname")));
-                System.out.println(c.getString(c.getColumnIndex("time")));
-                if(c.getString(c.getColumnIndex("time")).equals(time));
+               // System.out.println(c.getString(c.getColumnIndex("appname")));
+               // System.out.println(c.getString(c.getColumnIndex("time")));
+                if(c.getString(c.getColumnIndex("id")).equals(id));
                    packageName = c.getString(c.getColumnIndex("appname"));
             }
            while (c.moveToNext());

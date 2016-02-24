@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -44,6 +45,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
     String time;
     PackageInfo packageInfo;
     Context con;
+    int req_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +58,14 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         btn =(Button) findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                DbAdd(packageInfo.packageName,time,0,0,0,0,0,0,0,0,0);
+                System.out.println("in event adder id =" +req_id);
                if( Add_Alarm())
                  Toast.makeText(EventAdder.this, "Alarm Added",Toast.LENGTH_SHORT).show();
                 else
                    Toast.makeText(EventAdder.this, "Cannot add alarm!",Toast.LENGTH_SHORT).show();
-                DbAdd(packageInfo.packageName,time);
+
             }
         });
 
@@ -145,13 +150,14 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             calendar.add(Calendar.DATE, 1);
         }
         AlarmSet as = new AlarmSet();
-        as.setOnetimeTimer(getApplicationContext(),calendar);
+        as.setOnetimeTimer(getApplicationContext(),calendar,req_id);
         return true;
     }
-    private Boolean DbAdd(String name,String time){
+    private boolean DbAdd(String name,String time,int mon,int tue,int wed,int thur,int fri,int sat,int sund,int mode,int status){
 
         SqlOperator sqlOperator = new SqlOperator(getApplicationContext());
-        sqlOperator.createRecords(name,time);
+        sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
+        req_id = sqlOperator.getLastid() + 1;
         return true;
     }
 }
