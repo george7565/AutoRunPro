@@ -17,7 +17,6 @@ public class AlarmSet {
     public void SetRepeatAlarm(Context context, Calendar calendar)
     {
 
-
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         intent.putExtra(ONE_TIME, Boolean.FALSE);
