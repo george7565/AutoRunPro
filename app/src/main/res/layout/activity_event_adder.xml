@@ -36,7 +36,7 @@
         android:id="@+id/space"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:text="jgkjgkjkhhkhkkhjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
+        android:text=""
         android:layout_below="@+id/dynamic_spinner"
         android:paddingBottom="30dp"
         />

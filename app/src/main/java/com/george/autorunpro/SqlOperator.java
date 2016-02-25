@@ -63,7 +63,7 @@ public class SqlOperator{
         }
         return mCursor; // iterate to get each value.
     }
-    public int getLastid(){
+    public int getNextid(){
 
         int id;
         Cursor c = database.rawQuery("SELECT * FROM AppAlarms ORDER BY id DESC LIMIT 1", null);
