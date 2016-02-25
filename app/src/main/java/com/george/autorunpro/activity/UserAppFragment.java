@@ -49,7 +49,7 @@ public class UserAppFragment extends Fragment {
             public void onClick(View view) {
                 // Click action
              Toast.makeText(getContext(),"FAB",Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, EventAdder.class);
+                Intent intent = new Intent(getContext(), EventAdder.class);
                 startActivity(intent);
             }
         });
