@@ -60,6 +60,7 @@ public class UserAppFragment extends Fragment {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.fragment_home_card_list, parent, false));
+
         }
     } //view holder end
 
