@@ -23,7 +23,6 @@ import com.george.autorunpro.EventAdder;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,9 +78,11 @@ public class UserAppFragment extends Fragment {
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
                         title,     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
-                        c.getString(c.getColumnIndex("time"))// content
+                        c.getString(c.getColumnIndex("time"))// dummy content
                 ));
-
+               //version 2 commit
+               int next_mode = c.getInt(c.getColumnIndex("mode"));
+               String next_name = c.getString(c.getColumnIndex("appname"));
             } while (c.moveToNext());
             c.close();
             //using recycle view cutomizing card views
@@ -140,7 +141,6 @@ public class UserAppFragment extends Fragment {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-
             return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
@@ -153,6 +153,7 @@ public class UserAppFragment extends Fragment {
             System.out.println("In onbindViewholder card position = "+position);
             holder.appname.setText(temp.appname);
             holder.start_time.setText(temp.start_time);
+            holder.stop_time.setText(temp.stop_time);
 
             holder.deleteImageButton.setOnClickListener(new View.OnClickListener(){
 
