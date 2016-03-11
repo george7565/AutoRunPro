@@ -47,7 +47,7 @@ public class UserAppFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
+        int next_mode,next_appname;
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,17 +72,40 @@ public class UserAppFragment extends Fragment {
                 } catch (final PackageManager.NameNotFoundException e) {
                 }
                 final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
+                final String stop_time,start_time;
                 System.out.print("Title = " + title);
+                if( c.getInt(c.getColumnIndex("id")) > 1 && ){
+                    //checking mode and package names
+                    if   ((c.getInt(c.getColumnIndex("id")) == last_id + 1)) &&
+                         (title.equals(last_title))  &&
+                         (c.getInt(c.getColumnIndex("mode")) == 1 && last_mode == 0)){
+                             
+                          stop_time =  c.getString(c.getColumnIndex("time"));
+                          datalist.remove(last_id - 1) //datalist starts with 0   
+                          
+                            datalist.add(new Pojo_fetch_data(
+
+                                   last_id,        // datalist starts at index 0 //database id starts at 1
+                                   title,     // title                      //0th item has id 1
+                                   start_time,
+                                   stop_time"
+                                               ));
+                            continue;                   
+                         }
+                }
+                
                 datalist.add(new Pojo_fetch_data(
 
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
                         title,     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
-                        c.getString(c.getColumnIndex("time"))// dummy content
+                        "no:stop"
                 ));
                //version 2 commit
-               int next_mode = c.getInt(c.getColumnIndex("mode"));
-               String next_name = c.getString(c.getColumnIndex("appname"));
+               last_id = c.getInt(c.getColumnIndex("id"));
+               last_mode = c.getInt(c.getColumnIndex("mode"));
+               last_title = title;
+               start_time = c.getString(c.getColumnIndex("time"));
             } while (c.moveToNext());
             c.close();
             //using recycle view cutomizing card views
