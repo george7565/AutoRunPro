@@ -77,4 +77,18 @@ public class SqlOperator{
         c.close();
         return id;
     }
+  public Cursor selectRecord(String query){
+
+    Cursor c = database.rawQuery(query,null);
+    return c;
+  }
+
+    public void delete(int Id)
+    {
+        try {
+            database.delete(APP_TABLE, "Id="+Id, null);
+        }
+        catch(Exception e) {
+            e.printStackTrace(); }
+    }
 }

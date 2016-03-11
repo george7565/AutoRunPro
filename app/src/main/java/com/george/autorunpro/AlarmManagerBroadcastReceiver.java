@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -23,62 +24,59 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     Cursor c;
     int id;
     String packageName;
+    ActivityManager am;
     @Override
     public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
         //Acquire the lock
         wl.acquire();
-        //You can do the processing here.
 
         Bundle extras = intent.getExtras();
-        //StringBuilder msgStr = new StringBuilder();
 
         if(extras != null )
            id =  extras.getInt(REQ_ID);
         System.out.println("Inside reciever id="+id);
-            //Make sure this intent has been sent by the one-time timer button.
-            //msgStr.append("One time Timer : ");
-
-      //  Format formatter = new SimpleDateFormat("H:m");
-       // String time = formatter.format(new Date());
-       // Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
-        //running the application
         SqlOperator sqlOperator = new SqlOperator(context);
+        String query = "select * from 'AppAlarms' where id ="+id;
+
         try{
-         c = sqlOperator.selectRecords();
-            do{
-
-                if(c.getInt(c.getColumnIndex("id")) == id ){
-                    System.out.println(c.getString(c.getColumnIndex("appname")));
-                    System.out.println(c.getString(c.getColumnIndex("time")));
-                    packageName = c.getString(c.getColumnIndex("appname"));
-                }
-
-            }while(c.moveToNext());
-
+            c = sqlOperator.selectRecord(query);c.moveToFirst();
+            System.out.println(c.getString(c.getColumnIndex("appname")));
+            System.out.println(c.getString(c.getColumnIndex("time")));
+            packageName = c.getString(c.getColumnIndex("appname"));
+            int mode = c.getInt(c.getColumnIndex("mode"));
+            if (mode == 0)
+                startapplication(context);
+            else
+                stopapplication(context);
+            c.close();
         }
         catch (Exception e){    Log.i("Cursor exception: ", e.toString());    }
 
-        //
-        //String selectQuery = "SELECT lastchapter FROM Bookdetails WHERE bookpath=?";
-        //Cursor c = db.rawQuery(selectQuery, new String[] { fileName });
-        //if (c.moveToFirst()) {
-        //    temp_address = c.getString(c.getColumnIndex("lastchapter"));
-        //}
-        //c.close();
-        //
-
-        PackageManager packm = context.getPackageManager();
-         Intent LaunchIntent = packm.getLaunchIntentForPackage(packageName);
-         if (LaunchIntent != null) {
-              context.startActivity(LaunchIntent);
-          } else {
-              Toast.makeText(context, "Application  not found", Toast.LENGTH_SHORT).show();
-          }
-          context.startActivity( LaunchIntent );
         //Release the lock
         wl.release();
+    }
+
+    void startapplication(Context context) {
+        PackageManager packm = context.getPackageManager();
+        Intent LaunchIntent = packm.getLaunchIntentForPackage(packageName);
+        if (LaunchIntent != null) {
+            context.startActivity(LaunchIntent);
+        } else {
+            Toast.makeText(context, "Application  not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void stopapplication(Context context){
+
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(startMain);
+        am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        am.killBackgroundProcesses(packageName);
+
     }
 
 

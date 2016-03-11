@@ -14,9 +14,10 @@ import java.util.Calendar;
     public class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
 
-        String time;
+        String time,type;
+        Bundle bundle;
         public interface OnDataPass {
-             void onDataPass(String data);
+             void onDataPass(String data,String key);
         }
         OnDataPass dataPasser;
 
@@ -31,7 +32,8 @@ import java.util.Calendar;
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
-
+            bundle = this.getArguments();
+            type = bundle.getString("key");
             // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
@@ -40,11 +42,12 @@ import java.util.Calendar;
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             // Do something with the time chosen by the user
            time =  (Integer.toString(hourOfDay) + ":"+ Integer.toString(minute));
-            passData(time);
+            passData(time ,type);
 
         }
-        public void passData(String data) {
-            dataPasser.onDataPass(data);
+        public void passData(String data,String type) {
+
+            dataPasser.onDataPass(data,type);
         }
     }
 
