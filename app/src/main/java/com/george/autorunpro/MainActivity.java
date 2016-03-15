@@ -16,7 +16,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.george.autorunpro.activity.AppFragment;
 import com.george.autorunpro.activity.ServiceFragment;
+import com.george.autorunpro.activity.SettingFragment;
 import com.george.autorunpro.activity.SystemAppFragment;
 import com.george.autorunpro.activity.UserAppFragment;
 
@@ -28,8 +30,6 @@ public class MainActivity extends AppCompatActivity{
 
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,14 +79,13 @@ public class MainActivity extends AppCompatActivity{
                         return true;
                     }
                 });
-
     }
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new SystemAppFragment(), "List");
-        adapter.addFragment(new UserAppFragment(), "Tile");
-        adapter.addFragment(new ServiceFragment(), "Card");
+        adapter.addFragment(new SystemAppFragment(), "Services");
+        adapter.addFragment(new AppFragment(), "Applications");
+        adapter.addFragment(new ServiceFragment(), "Functions");
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
     }

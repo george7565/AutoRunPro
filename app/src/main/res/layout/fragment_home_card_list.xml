@@ -6,19 +6,20 @@
     android:layout_marginBottom="@dimen/md_keylines"
     android:layout_marginLeft="@dimen/md_keylines"
     android:layout_marginRight="@dimen/md_keylines"
-    android:foreground="?attr/selectableItemBackground"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    android:foreground="?attr/selectableItemBackground">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-<!--
-        <ImageView
+
+        <!--<ImageView
             android:id="@+id/card_image"
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_image_height"
-            android:scaleType="centerCrop"
-            android:src="@drawable/paris" /> -->
+            android:tileMode="repeat"
+            android:dither="true"
+            android:src="@android:color/transparent" /> -->
+
         <TextView
             android:id="@+id/appname"
             android:layout_width="wrap_content"
