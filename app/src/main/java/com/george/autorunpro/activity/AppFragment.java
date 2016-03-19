@@ -22,6 +22,7 @@ import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 import com.george.autorunpro.adapter.RecyclerviewAdapter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -39,7 +40,6 @@ public class AppFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private RecyclerView recyclerView;
     private RecyclerviewAdapter recyclerviewAdapter;
 
@@ -84,8 +84,8 @@ public class AppFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), EventAdder.class);
-                startActivity(intent);
+                //Intent intent = new Intent(getContext(), EventAdder.class);
+                startActivityForResult(new Intent(getContext(), EventAdder.class), 121);
             }
         });
 
@@ -119,12 +119,12 @@ public class AppFragment extends Fragment {
                 }
                 catch (final PackageManager.NameNotFoundException e) { }
 
-               // final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
+                final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
                 //final Drawable icon = packageManager.getApplicationIcon(applicationInfo);
                 datalist.add(new Pojo_fetch_data(
 
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
-                        c.getString(c.getColumnIndex("appname")),     // title                      //0th item has id 1
+                        title,     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
                         "na"
                 ));
@@ -135,4 +135,31 @@ public class AppFragment extends Fragment {
         return datalist;
     }
 
-}
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 121 && resultCode == getActivity().RESULT_OK) {
+
+            String alarmtype = data.getExtras().get("passed_item").toString();
+            Cursor c = new SqlOperator(getContext()).selectRecord("select * from AppAlarms order by id desc limit 2");
+            int id = c.getInt(c.getColumnIndex("id"));
+            String title = c.getString(c.getColumnIndex("appname"));
+            String start_time = c.getString(c.getColumnIndex("time"));
+            Pojo_fetch_data new_data;
+            if(alarmtype.equals("mono")){
+
+
+                new_data = new Pojo_fetch_data(id,title,start_time,"na");
+
+            }else{
+                 c.moveToNext();
+                 String stop_time = null;
+                 new_data = new Pojo_fetch_data(id,title,start_time,stop_time);
+
+            }
+         recyclerviewAdapter.addData(new_data);
+
+        }
+    }//onactivity result end
+
+} //fragment close

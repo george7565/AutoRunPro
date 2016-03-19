@@ -19,7 +19,9 @@
             </intent-filter>
         </activity>
         <receiver android:name=".AlarmManagerBroadcastReceiver" />
-        <activity android:name=".EventAdder"></activity>
+        <activity android:name=".EventAdder">
+
+        </activity>
     </application>
 
 </manifest>

@@ -21,7 +21,9 @@ import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,8 +54,13 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         System.out.println("temp.id on onbind view holder ="+current_data.id);
         System.out.println("In onbindViewholder card position = "+position);
         holder.appname.setText(current_data.appname);
-        holder.start_time.setText(current_data.start_time);
-        holder.stop_time.setText(current_data.stop_time);
+
+
+        holder.start_time.setText(time_in_12hr(current_data.start_time));
+        if (! current_data.stop_time.equals("na") )
+            holder.stop_time.setText(time_in_12hr(current_data.stop_time));
+        else
+            holder.stop_time.setText(current_data.stop_time);
         holder.deleteImageButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -91,6 +98,13 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         notifyItemRemoved(position);
       //  notifyItemRangeChanged(position, list.size());
        // notifyDataSetChanged();
+
+    }
+    @UiThread
+    public void addData(Pojo_fetch_data data){
+
+        this.datalist.add(data);
+        notifyItemInserted(this.datalist.size() - 1);
 
     }
 
@@ -138,6 +152,18 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         }
     }
 
+   private String time_in_12hr(String time){
 
+
+       try{
+           final SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+           final Date dateObj = sdf.parse(time);
+           String time_12hr = new SimpleDateFormat("hh:mm aa").format(dateObj).toString();
+           return time_12hr;
+       }catch (Exception e){
+           e.printStackTrace();
+           return time;
+       }
+   }
 
 }//adapter end

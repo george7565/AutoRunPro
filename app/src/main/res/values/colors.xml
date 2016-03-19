@@ -13,4 +13,5 @@
     <color name="tab_background_selected">#3F51B5</color>
     <color name="tab_background_unselected">#3F51B5</color>
     <color name="black_overlay">#66000000</color>
+    <color name="event_adder_back">#655EF9</color>
 </resources>

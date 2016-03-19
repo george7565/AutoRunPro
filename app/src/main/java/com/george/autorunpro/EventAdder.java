@@ -52,6 +52,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
     int req_id;
     CheckBox sun,mon,tue,wed,thu,fri,sat;
     int sunb,monb,tueb,wedb,thub,frib,satb;
+    String last_alarm = null;
 
 
     @Override
@@ -117,7 +118,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                     DbAdd(packageInfo.packageName, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1);
                         System.out.println("in event adder id for only start=" + req_id);
                     Add_Alarm(start_timme);
-
+                    last_alarm = "mono";
                     }
 
                     else{
@@ -128,7 +129,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                     DbAdd(packageInfo.packageName, stop_timme, monb, tueb, wedb, thub, frib, satb, sunb, 1, 1);
                         System.out.println("in event adder id for stop in run kill=" + req_id);
                     Add_Alarm(stop_timme);
-
+                    last_alarm = "dual";
                     }
 
 
@@ -241,6 +242,14 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
         req_id = sqlOperator.getNextid();
         return true;
+    }
+
+    @Override
+    public void finish() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("passed_item", last_alarm);
+        setResult(RESULT_OK);
+        super.finish();
     }
 }
 
