@@ -126,7 +126,8 @@ public class AppFragment extends Fragment {
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
                         title,     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
-                        "na"
+                        "na",
+                        c.getInt(c.getColumnIndex("status"))
                 ));
             } while (c.moveToNext());
             c.close();
@@ -145,16 +146,17 @@ public class AppFragment extends Fragment {
             int id = c.getInt(c.getColumnIndex("id"));
             String title = c.getString(c.getColumnIndex("appname"));
             String start_time = c.getString(c.getColumnIndex("time"));
+            int status = c.getInt(c.getColumnIndex("status"));
             Pojo_fetch_data new_data;
             if(alarmtype.equals("mono")){
 
 
-                new_data = new Pojo_fetch_data(id,title,start_time,"na");
+                new_data = new Pojo_fetch_data(id,title,start_time,"na",status);
 
             }else{
                  c.moveToNext();
                  String stop_time = null;
-                 new_data = new Pojo_fetch_data(id,title,start_time,stop_time);
+                 new_data = new Pojo_fetch_data(id,title,start_time,stop_time,status);
 
             }
          recyclerviewAdapter.addData(new_data);

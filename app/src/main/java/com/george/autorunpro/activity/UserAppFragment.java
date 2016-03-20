@@ -78,7 +78,8 @@ public class UserAppFragment extends Fragment {
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
                         c.getString(c.getColumnIndex("appname")),     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
-                        "na"
+                        "na",
+                        c.getInt(c.getColumnIndex("status"))
                 ));
             } while (c.moveToNext());
             c.close();

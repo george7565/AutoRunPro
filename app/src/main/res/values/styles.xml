@@ -25,8 +25,8 @@
     </style>
 
     <style name="AlarmsetButton" parent="Theme.AppCompat.Light">
-        <item name="colorControlHighlight">@color/colorPrimary</item>
-        <item name="colorButtonNormal">@color/colorPrimaryDark</item>
+        <item name="colorControlHighlight">@color/color_alarm_btn_hl</item>
+        <item name="colorButtonNormal">@color/color_alarm_btn</item>
     </style>
 
     <style name="MyMaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

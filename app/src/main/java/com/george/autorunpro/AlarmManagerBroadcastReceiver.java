@@ -23,7 +23,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     final public static String REQ_ID= "id";
     Cursor c;
     int id;
-    String packageName;
+    String packageName,type;
     ActivityManager am;
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -34,8 +34,11 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         Bundle extras = intent.getExtras();
 
-        if(extras != null )
-           id =  extras.getInt(REQ_ID);
+        if(extras != null ) {
+            id = extras.getInt(REQ_ID);
+            type = extras.getString("type");
+        }
+
         System.out.println("Inside reciever id="+id);
         SqlOperator sqlOperator = new SqlOperator(context);
         String query = "select * from 'AppAlarms' where id ="+id;
@@ -46,10 +49,54 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             System.out.println(c.getString(c.getColumnIndex("time")));
             packageName = c.getString(c.getColumnIndex("appname"));
             int mode = c.getInt(c.getColumnIndex("mode"));
-            if (mode == 0)
-                startapplication(context);
-            else
-                stopapplication(context);
+
+            if(type.equals("repeating")) {
+                int mon = c.getInt(c.getColumnIndex("monday"));
+                int tue = c.getInt(c.getColumnIndex("tuesday"));
+                int wed = c.getInt(c.getColumnIndex("wednesday"));
+                int thu = c.getInt(c.getColumnIndex("thursday"));
+                int fri = c.getInt(c.getColumnIndex("friday"));
+                int sat = c.getInt(c.getColumnIndex("saturday"));
+                int sun = c.getInt(c.getColumnIndex("sunday"));
+                //getting current day from phone calender
+                Calendar calendar = Calendar.getInstance();
+                int day = calendar.get(Calendar.DAY_OF_WEEK); //sun == 1 and sat ==7
+                //
+                switch (day) {
+                    case Calendar.SUNDAY:
+                        if(sun == 1){choose(context,mode);}
+                        break;
+
+                    case Calendar.MONDAY:
+                        if(mon == 1){choose(context,mode);}
+                        break;
+
+                    case Calendar.TUESDAY:
+                        if(tue == 1){choose(context,mode);}
+                        break;
+
+                    case Calendar.WEDNESDAY:
+                        if(wed == 1){choose(context,mode);}
+                        break;
+
+                    case Calendar.THURSDAY:
+                        if(thu == 1){choose(context,mode);}
+                        break;
+
+                    case Calendar.FRIDAY:
+                        if(fri == 1){choose(context,mode);}
+                        break;
+
+                    case Calendar.SATURDAY:
+                        if(sat == 1){choose(context,mode);}
+                        break;
+                }
+
+            }
+            else {
+                //one time fire only
+                choose(context,mode);
+            }
             c.close();
         }
         catch (Exception e){    Log.i("Cursor exception: ", e.toString());    }
@@ -76,6 +123,14 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         context.startActivity(startMain);
         am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         am.killBackgroundProcesses(packageName);
+
+    }
+    void choose(Context context,int mode){
+
+        if (mode == 0)
+            startapplication(context);
+        else
+            stopapplication(context);
 
     }
 

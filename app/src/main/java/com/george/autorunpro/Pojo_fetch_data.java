@@ -8,13 +8,15 @@ public class Pojo_fetch_data {
         public int id;
         public  String appname;
         public String start_time,stop_time;
+        public int status;
 
 
-        public Pojo_fetch_data(int id, String name, String start, String stop) {
+        public Pojo_fetch_data(int id, String name, String start, String stop,int status) {
             this.id = id;
             this.appname = name;
             this.start_time = start;
             this.stop_time = stop;
+            this.status = status;
         }
     }
 

@@ -14,4 +14,7 @@
     <color name="tab_background_unselected">#3F51B5</color>
     <color name="black_overlay">#66000000</color>
     <color name="event_adder_back">#655EF9</color>
+    <color name="color_alarm_btn">#B0171F</color>
+    <color name="color_alarm_btn_hl">#CD0000</color>
+
 </resources>

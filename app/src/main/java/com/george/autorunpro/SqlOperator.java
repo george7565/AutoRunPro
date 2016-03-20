@@ -77,11 +77,28 @@ public class SqlOperator{
         c.close();
         return id;
     }
-  public Cursor selectRecord(String query){
 
-    Cursor c = database.rawQuery(query,null);
-    return c;
-  }
+
+    public Cursor selectRecord(String query){
+
+            Cursor c = database.rawQuery(query,null);
+            return c;
+    }
+
+    public boolean updateRecord(int id,ContentValues contentValues){
+
+
+        try {
+            database.update(APP_TABLE,contentValues, "Id="+id, null);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
 
     public void delete(int Id)
     {
@@ -91,4 +108,5 @@ public class SqlOperator{
         catch(Exception e) {
             e.printStackTrace(); }
     }
+
 }
