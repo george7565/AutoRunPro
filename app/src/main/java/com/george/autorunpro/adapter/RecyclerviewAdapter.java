@@ -127,6 +127,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
                                 }
                                 datalist.get(position).status = 0;current_data.status = 0;
+                                Snackbar.make(buttonView, "App Timer Off",
+                                        Snackbar.LENGTH_LONG).show();
                             }
 
 
@@ -162,6 +164,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                                         am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
                                 }
                                 datalist.get(position).status = 1;current_data.status = 1;
+                                Snackbar.make(buttonView, "App Timer On",
+                                        Snackbar.LENGTH_LONG).show();
                             }
 
                         }

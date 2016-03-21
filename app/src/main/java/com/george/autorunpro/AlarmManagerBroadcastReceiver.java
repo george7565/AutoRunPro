@@ -1,12 +1,9 @@
 package com.george.autorunpro;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-
 import android.app.ActivityManager;
-import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -108,6 +105,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     void startapplication(Context context) {
         PackageManager packm = context.getPackageManager();
         Intent LaunchIntent = packm.getLaunchIntentForPackage(packageName);
+        Notification_Service notification_service = new Notification_Service(context,"Starting App","AutoRun Pro has started "+packageName+" for you");
+        notification_service.showNotification();
         if (LaunchIntent != null) {
             context.startActivity(LaunchIntent);
         } else {
@@ -123,6 +122,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         context.startActivity(startMain);
         am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         am.killBackgroundProcesses(packageName);
+        Notification_Service notification_service = new Notification_Service(context,"Stopping App","AutoRun Pro has stopped "+packageName+" for you");
+        notification_service.showNotification();
 
     }
     void choose(Context context,int mode){
@@ -133,6 +134,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             stopapplication(context);
 
     }
+
+
 
 
 }
