@@ -6,8 +6,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -91,7 +93,10 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
             }
             else {
-                //one time fire only
+                //one time fire only turning off after time
+                ContentValues cv = new ContentValues();
+                cv.put("status",0);
+                sqlOperator.updateRecord(c.getInt(c.getColumnIndex("id")),cv);
                 choose(context,mode);
             }
             c.close();
@@ -105,7 +110,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     void startapplication(Context context) {
         PackageManager packm = context.getPackageManager();
         Intent LaunchIntent = packm.getLaunchIntentForPackage(packageName);
-        Notification_Service notification_service = new Notification_Service(context,"Starting App","AutoRun Pro has started "+packageName+" for you");
+        Notification_Service notification_service = new Notification_Service(context,"Starting App","AutoRun Pro has started "+getTitle(context,packageName)+" for you");
         notification_service.showNotification();
         if (LaunchIntent != null) {
             context.startActivity(LaunchIntent);
@@ -122,7 +127,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         context.startActivity(startMain);
         am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         am.killBackgroundProcesses(packageName);
-        Notification_Service notification_service = new Notification_Service(context,"Stopping App","AutoRun Pro has stopped "+packageName+" for you");
+        Notification_Service notification_service = new Notification_Service(context,"Stopping App","AutoRun Pro has stopped "+getTitle(context,packageName)+" for you");
         notification_service.showNotification();
 
     }
@@ -133,6 +138,20 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         else
             stopapplication(context);
 
+    }
+    protected String getTitle(Context context,String  packageName){
+
+        ApplicationInfo applicationInfo = null;
+        PackageManager packageManager = context.getPackageManager();
+
+        try {
+            applicationInfo = packageManager.getApplicationInfo(packageName, 0);
+
+        }
+        catch (final PackageManager.NameNotFoundException e) { }
+        final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
+
+        return title;
     }
 
 

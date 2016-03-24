@@ -1,5 +1,4 @@
 package com.george.autorunpro.activity;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -16,23 +15,22 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.george.autorunpro.EventAdder;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class UserAppFragment extends Fragment {
 
@@ -52,6 +50,7 @@ public class UserAppFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.simple_grow);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,6 +58,7 @@ public class UserAppFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
 
         sqlOperator = new SqlOperator(getContext());
         Cursor c = sqlOperator.selectRecords();
@@ -87,11 +87,12 @@ public class UserAppFragment extends Fragment {
             recyclerView = (RecyclerView) inflater.inflate(
                     R.layout.recycler_view, container, false);
             adapter = new ContentAdapter(datalist);
-            recyclerView.setAdapter(adapter);
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
+            //recyclerView.setItemAnimator(new DefaultItemAnimator());
         }
+        fab.startAnimation(animation);
         return recyclerView;
     }
 

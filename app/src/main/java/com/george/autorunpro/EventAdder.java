@@ -100,18 +100,20 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                //checking weekday checkboxes checked or not
+                if(sun.isChecked()) sunb = 1; else sunb = 0;
+                if(mon.isChecked()) monb = 1; else monb = 0;
+                if(tue.isChecked()) tueb = 1; else tueb = 0;
+                if(wed.isChecked()) wedb = 1; else wedb = 0;
+                if(thu.isChecked()) thub = 1; else thub = 0;
+                if(fri.isChecked()) frib = 1; else frib = 0;
+                if(sat.isChecked()) satb = 1; else satb = 0;
+
                 if (start_time.getText().toString().length() == 0 ) {
                     Snackbar.make(v, "Enter the Start time!",
                             Snackbar.LENGTH_LONG).show();
-                } else {
-                    //checking weekday checkboxes checked or not
-                    if(sun.isChecked()) sunb = 1; else sunb = 0;
-                    if(mon.isChecked()) monb = 1; else monb = 0;
-                    if(tue.isChecked()) tueb = 1; else tueb = 0;
-                    if(wed.isChecked()) wedb = 1; else wedb = 0;
-                    if(thu.isChecked()) thub = 1; else thub = 0;
-                    if(fri.isChecked()) frib = 1; else frib = 0;
-                    if(sat.isChecked()) satb = 1; else satb = 0;
+                }
+                else {
 
                     if(stop_time.getText().toString().length() == 0){
 
@@ -130,14 +132,12 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                         System.out.println("in event adder id for stop in run kill=" + req_id);
                     Add_Alarm(stop_timme);
                     last_alarm = "dual";
+
                     }
 
 
                     Snackbar.make(v, "Alarm Added!",
                             Snackbar.LENGTH_LONG).show();
-
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
                     finish();
                 }
             }
@@ -199,7 +199,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             //System.out.println("Inside ondatapass="+time_temp);
             final SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
             final Date dateObj = sdf.parse(time_temp);
-            String time_12hr = new SimpleDateFormat("hh:mm aa").format(dateObj).toString(); //convert to 10:10 AM
+            String time_12hr = new SimpleDateFormat("hh:mm aa").format(dateObj); //convert to 10:10 AM
 
             if(type.equals("start")){
                  start_timme = time_temp;
@@ -246,9 +246,10 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
 
     @Override
     public void finish() {
+        System.out.println("running onfinish");
         Intent returnIntent = new Intent();
         returnIntent.putExtra("passed_item", last_alarm);
-        setResult(RESULT_OK);
+        setResult(RESULT_OK,returnIntent);
         super.finish();
     }
 }

@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -43,10 +46,13 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
     private LayoutInflater inflator;
     List<Pojo_fetch_data> datalist = Collections.emptyList();
+    private int lastPosition = -1;
+    private RecyclerView recyclerView;
 
-    public RecyclerviewAdapter(Context context,List<Pojo_fetch_data> datalist){
+    public RecyclerviewAdapter(Context context,List<Pojo_fetch_data> datalist,RecyclerView recyclerView){
         inflator = LayoutInflater.from(context);
         this.datalist = datalist;
+        this.recyclerView = recyclerView;
 
     }
     @Override
@@ -55,10 +61,19 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         myViewHolder holder = new myViewHolder(view);
         return holder;
     }
+    @Override
+    public void onViewDetachedFromWindow(myViewHolder holder){
+
+        holder.itemView.clearAnimation();
+
+    }
 
     @Override
     public void onBindViewHolder(final myViewHolder holder, final int position) {
 
+        Animation animation = AnimationUtils.loadAnimation(holder.itemView.getContext(),
+                (position > lastPosition) ? R.anim.up_from_bottom
+                        : R.anim.down_from_top);
         final Pojo_fetch_data current_data = this.datalist.get(position);
         System.out.println("temp.id on onbind view holder ="+current_data.id);
         System.out.println("In onbindViewholder card position = "+position);
@@ -177,7 +192,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             }
         });
 
-
+        holder.itemView.startAnimation(animation);
+        lastPosition = position;
     }
 
 
@@ -186,8 +202,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
         list.remove(position);
         notifyItemRemoved(position);
-      //  notifyItemRangeChanged(position, list.size());
-       // notifyDataSetChanged();
 
     }
     @UiThread
@@ -195,6 +209,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
         this.datalist.add(data);
         notifyItemInserted(this.datalist.size() - 1);
+        this.recyclerView.smoothScrollToPosition(this.datalist.size() - 1);
 
     }
 

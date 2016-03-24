@@ -13,14 +13,22 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
+
 import com.george.autorunpro.EventAdder;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 import com.george.autorunpro.adapter.RecyclerviewAdapter;
+import com.george.autorunpro.model.RecyclerScroll;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,8 +87,8 @@ public class AppFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View layout = inflater.inflate(R.layout.fragment_app, container, false);
-
-        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.simple_grow);
+        final FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,10 +98,26 @@ public class AppFragment extends Fragment {
         });
 
         recyclerView = (RecyclerView) layout.findViewById(R.id.app_recycler_view);
-        recyclerviewAdapter = new RecyclerviewAdapter(getActivity(), getData(getContext()));
+        recyclerviewAdapter = new RecyclerviewAdapter(getActivity(), getData(getContext()),recyclerView);
         recyclerView.setAdapter(recyclerviewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //fab up down animation
+        final  int fabMargin = 16;
+        recyclerView.addOnScrollListener(new RecyclerScroll() {
+            @Override
+            public void show() {
+                fab.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+            }
+            @Override
+            public void hide() {
+                fab.animate().translationY(fab.getHeight() + fabMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+            }
+        });
+        //animation end
+
+        //fab grow animation start
+        fab.startAnimation(animation);
         return layout;
     }
 
@@ -138,30 +162,42 @@ public class AppFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 121 && resultCode == getActivity().RESULT_OK) {
+        if (requestCode == 121) {
 
             String alarmtype = data.getExtras().get("passed_item").toString();
             Cursor c = new SqlOperator(getContext()).selectRecord("select * from AppAlarms order by id desc limit 2");
-            int id = c.getInt(c.getColumnIndex("id"));
-            String title = c.getString(c.getColumnIndex("appname"));
-            String start_time = c.getString(c.getColumnIndex("time"));
-            int status = c.getInt(c.getColumnIndex("status"));
-            Pojo_fetch_data new_data;
-            if(alarmtype.equals("mono")){
+            if(c != null) {
+                c.moveToFirst();
+                int id = c.getInt(c.getColumnIndex("id"));
+                ApplicationInfo applicationInfo = null;
+                PackageManager packageManager = getContext().getPackageManager();
+                //app name from package name
+                try {
+                    applicationInfo = packageManager.getApplicationInfo(c.getString(c.getColumnIndex("appname")), 0);
 
+                }
+                catch (final PackageManager.NameNotFoundException e) { e.printStackTrace();}
+                final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
+                //app name obtained
+                String start_time = c.getString(c.getColumnIndex("time"));
+                int status = c.getInt(c.getColumnIndex("status"));
+                Pojo_fetch_data new_data;
+                if (alarmtype.equals("mono")) {
+                    new_data = new Pojo_fetch_data(id, title, start_time, "na", status);
+                } else {
+                    //start time time is the 2nd row as order is desc
+                    c.moveToNext();
+                    String stop_time = start_time;
+                    start_time = c.getString(c.getColumnIndex("time"));//start time
+                    new_data = new Pojo_fetch_data(id, title, start_time, stop_time, status);
 
-                new_data = new Pojo_fetch_data(id,title,start_time,"na",status);
-
-            }else{
-                 c.moveToNext();
-                 String stop_time = null;
-                 new_data = new Pojo_fetch_data(id,title,start_time,stop_time,status);
-
+                }
+                recyclerviewAdapter.addData(new_data);
             }
-         recyclerviewAdapter.addData(new_data);
-
+            System.out.print("running onactivity");
         }
+        System.out.print("running onactivity");
+        super.onActivityResult(requestCode, resultCode, data);
     }//onactivity result end
 
 } //fragment close
