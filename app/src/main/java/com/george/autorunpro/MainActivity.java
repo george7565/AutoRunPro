@@ -17,10 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.george.autorunpro.activity.AppFragment;
-import com.george.autorunpro.activity.ServiceFragment;
-import com.george.autorunpro.activity.SettingFragment;
-import com.george.autorunpro.activity.SystemAppFragment;
-import com.george.autorunpro.activity.UserAppFragment;
+import com.george.autorunpro.activity.FunctionFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,11 +80,10 @@ public class MainActivity extends AppCompatActivity{
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new SystemAppFragment(), "Services");
         adapter.addFragment(new AppFragment(), "Applications");
-        adapter.addFragment(new ServiceFragment(), "Functions");
+        adapter.addFragment(new FunctionFragment(), "Functions");
         viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(0);
     }
 
     static class Adapter extends FragmentPagerAdapter {

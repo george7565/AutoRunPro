@@ -22,12 +22,16 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
 
 import com.george.autorunpro.EventAdder;
+import com.george.autorunpro.FunctionAdder;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
+import com.george.autorunpro.SqlOperator2;
 import com.george.autorunpro.adapter.RecyclerviewAdapter;
+import com.george.autorunpro.adapter.RecyclerviewAdapter2;
 import com.george.autorunpro.model.RecyclerScroll;
 
 import java.util.ArrayList;
@@ -40,7 +44,7 @@ import java.util.List;
  * Use the {@link AppFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AppFragment extends Fragment {
+public class FunctionFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,9 +54,9 @@ public class AppFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private RecyclerView recyclerView;
-    private RecyclerviewAdapter recyclerviewAdapter;
+    private RecyclerviewAdapter2 recyclerviewAdapter;
 
-    public AppFragment() {
+    public FunctionFragment() {
         // Required empty public constructor
     }
 
@@ -65,8 +69,8 @@ public class AppFragment extends Fragment {
      * @return A new instance of fragment AppFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static AppFragment newInstance(String param1, String param2) {
-        AppFragment fragment = new AppFragment();
+    public static FunctionFragment newInstance(String param1, String param2) {
+        FunctionFragment fragment = new FunctionFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -87,23 +91,23 @@ public class AppFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View layout = inflater.inflate(R.layout.fragment_app, container, false);
-        final Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.simple_grow);
-        final FloatingActionButton fab = (FloatingActionButton) layout.findViewById(R.id.fab1);
-        fab.hide();
+        View layout = inflater.inflate(R.layout.fragment_function, container, false);
+        final FloatingActionButton fab = (FloatingActionButton) layout.findViewById(R.id.fab2);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(getContext(), EventAdder.class), 121);
+
+                startActivityForResult(new Intent(getContext(), FunctionAdder.class), 123);
             }
         });
 
-        recyclerView = (RecyclerView) layout.findViewById(R.id.app_recycler_view);
-        recyclerviewAdapter = new RecyclerviewAdapter(getActivity(), getData(getContext()),recyclerView);
+        recyclerView = (RecyclerView) layout.findViewById(R.id.fn_recycler_view);
+        recyclerviewAdapter = new RecyclerviewAdapter2(getActivity(), getData(getContext()),recyclerView);
         recyclerView.setAdapter(recyclerviewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //fab up down animation
+        //fab up down
+
         final  int fabMargin = 16;
         recyclerView.addOnScrollListener(new RecyclerScroll() {
             @Override
@@ -116,15 +120,6 @@ public class AppFragment extends Fragment {
             }
         });
         //animation end
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                fab.show();
-                fab.startAnimation(animation);
-            }
-        }, 700);
-        //fab grow animation start
 
         return layout;
     }
@@ -133,9 +128,9 @@ public class AppFragment extends Fragment {
 
         List<Pojo_fetch_data> datalist = new ArrayList<>();
         ApplicationInfo applicationInfo = null;
-        SqlOperator sqlOperator = new SqlOperator(context);
+        SqlOperator2 sqlOperator = new SqlOperator2(context);
         Cursor c = sqlOperator.selectRecords();
-        PackageManager packageManager = context.getPackageManager();
+
         if (c.moveToFirst()) {
             do {
                 //checkn mode =1 for kill events
@@ -145,18 +140,11 @@ public class AppFragment extends Fragment {
                     continue;
                 }
 
-                try {
-                    applicationInfo = packageManager.getApplicationInfo(c.getString(c.getColumnIndex("appname")), 0);
-
-                }
-                catch (final PackageManager.NameNotFoundException e) { }
-
-                final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
                 //final Drawable icon = packageManager.getApplicationIcon(applicationInfo);
                 datalist.add(new Pojo_fetch_data(
 
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
-                        title,     // title                      //0th item has id 1
+                        c.getString(c.getColumnIndex("funcname")),     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
                         "na",
                         c.getInt(c.getColumnIndex("status"))
@@ -170,34 +158,25 @@ public class AppFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 121 && resultCode == getActivity().RESULT_OK) {
+        if (requestCode == 123 && resultCode == getActivity().RESULT_OK) {
 
             String alarmtype = data.getExtras().get("passed_item").toString();
-            Cursor c = new SqlOperator(getContext()).selectRecord("select * from AppAlarms order by id desc limit 2");
+            Cursor c = new SqlOperator2(getContext()).selectRecord("select * from FuncAlarms order by id desc limit 2");
             if(c != null) {
                 c.moveToFirst();
                 int id = c.getInt(c.getColumnIndex("id"));
-                ApplicationInfo applicationInfo = null;
-                PackageManager packageManager = getContext().getPackageManager();
-                //app name from package name
-                try {
-                    applicationInfo = packageManager.getApplicationInfo(c.getString(c.getColumnIndex("appname")), 0);
-
-                }
-                catch (final PackageManager.NameNotFoundException e) { e.printStackTrace();}
-                final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
-                //app name obtained
                 String start_time = c.getString(c.getColumnIndex("time"));
                 int status = c.getInt(c.getColumnIndex("status"));
+                String name = c.getString(c.getColumnIndex("funcname"));
                 Pojo_fetch_data new_data;
                 if (alarmtype.equals("mono")) {
-                    new_data = new Pojo_fetch_data(id, title, start_time, "na", status);
+                    new_data = new Pojo_fetch_data(id, name, start_time, "na", status);
                 } else {
                     //start time time is the 2nd row as order is desc
                     c.moveToNext();
                     String stop_time = start_time;
                     start_time = c.getString(c.getColumnIndex("time"));//start time
-                    new_data = new Pojo_fetch_data(id, title, start_time, stop_time, status);
+                    new_data = new Pojo_fetch_data(id, name, start_time, stop_time, status);
 
                 }
                 recyclerviewAdapter.addData(new_data);

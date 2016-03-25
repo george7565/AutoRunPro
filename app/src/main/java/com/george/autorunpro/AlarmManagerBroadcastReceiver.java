@@ -22,7 +22,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     final public static String REQ_ID= "id";
     Cursor c;
     int id;
-    String packageName,type;
+    String packageName,type,funcname;
+    boolean is_a_function;
     ActivityManager am;
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -39,72 +40,124 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         }
 
         System.out.println("Inside reciever id="+id);
-        SqlOperator sqlOperator = new SqlOperator(context);
-        String query = "select * from 'AppAlarms' where id ="+id;
+            if(id < 500) {
 
-        try{
-            c = sqlOperator.selectRecord(query);c.moveToFirst();
-            System.out.println(c.getString(c.getColumnIndex("appname")));
-            System.out.println(c.getString(c.getColumnIndex("time")));
-            packageName = c.getString(c.getColumnIndex("appname"));
-            int mode = c.getInt(c.getColumnIndex("mode"));
+                try {
+                    is_a_function = false;
+                    String query = "select * from 'AppAlarms' where id =" + id;
+                    SqlOperator sqlOperator = new SqlOperator(context);
+                    c = sqlOperator.selectRecord(query);
+                    c.moveToFirst();
+                    System.out.println(c.getString(c.getColumnIndex("appname")));
+                    System.out.println(c.getString(c.getColumnIndex("time")));
+                    packageName = c.getString(c.getColumnIndex("appname"));
+                    int mode = c.getInt(c.getColumnIndex("mode"));
+                    Boolean issinglealarm = alarmtype_selector(context, mode);
+                    if(issinglealarm){
+                        ContentValues cv = new ContentValues();
+                        cv.put("status", 0);
+                        sqlOperator.updateRecord(c.getInt(c.getColumnIndex("id")), cv);
+                    }
 
-            if(type.equals("repeating")) {
-                int mon = c.getInt(c.getColumnIndex("monday"));
-                int tue = c.getInt(c.getColumnIndex("tuesday"));
-                int wed = c.getInt(c.getColumnIndex("wednesday"));
-                int thu = c.getInt(c.getColumnIndex("thursday"));
-                int fri = c.getInt(c.getColumnIndex("friday"));
-                int sat = c.getInt(c.getColumnIndex("saturday"));
-                int sun = c.getInt(c.getColumnIndex("sunday"));
-                //getting current day from phone calender
-                Calendar calendar = Calendar.getInstance();
-                int day = calendar.get(Calendar.DAY_OF_WEEK); //sun == 1 and sat ==7
-                //
-                switch (day) {
-                    case Calendar.SUNDAY:
-                        if(sun == 1){choose(context,mode);}
-                        break;
-
-                    case Calendar.MONDAY:
-                        if(mon == 1){choose(context,mode);}
-                        break;
-
-                    case Calendar.TUESDAY:
-                        if(tue == 1){choose(context,mode);}
-                        break;
-
-                    case Calendar.WEDNESDAY:
-                        if(wed == 1){choose(context,mode);}
-                        break;
-
-                    case Calendar.THURSDAY:
-                        if(thu == 1){choose(context,mode);}
-                        break;
-
-                    case Calendar.FRIDAY:
-                        if(fri == 1){choose(context,mode);}
-                        break;
-
-                    case Calendar.SATURDAY:
-                        if(sat == 1){choose(context,mode);}
-                        break;
+                    c.close();
+                } catch (Exception e) {
+                    Log.i("Cursor exception: ", e.toString());
                 }
+            }
+        else{
+                try {
+                    is_a_function = true;
+                    String query = "select * from 'FuncAlarms' where id =" + id;
+                    SqlOperator2 sqlOperator = new SqlOperator2(context);
+                    c = sqlOperator.selectRecord(query);
+                    c.moveToFirst();
+                    System.out.println(c.getString(c.getColumnIndex("funcname")));
+                    System.out.println(c.getString(c.getColumnIndex("time")));
+                    funcname = c.getString(c.getColumnIndex("funcname"));
+                    int mode = c.getInt(c.getColumnIndex("mode"));
+                    Boolean issinglealarm = alarmtype_selector(context, mode);
+                    if(issinglealarm){
+                        ContentValues cv = new ContentValues();
+                        cv.put("status", 0);
+                        sqlOperator.updateRecord(c.getInt(c.getColumnIndex("id")), cv);
+                    }
 
+                    c.close();
+                } catch (Exception e) {
+                    Log.i("Cursor exception: ", e.toString());
+                }
             }
-            else {
-                //one time fire only turning off after time
-                ContentValues cv = new ContentValues();
-                cv.put("status",0);
-                sqlOperator.updateRecord(c.getInt(c.getColumnIndex("id")),cv);
-                choose(context,mode);
-            }
-            c.close();
-        }
-        catch (Exception e){    Log.i("Cursor exception: ", e.toString());    }
 
         //Release the lock
         wl.release();
+
+    }
+     private boolean alarmtype_selector(Context context,int mode){
+
+        if (type.equals("repeating")) {
+            int mon = c.getInt(c.getColumnIndex("monday"));
+            int tue = c.getInt(c.getColumnIndex("tuesday"));
+            int wed = c.getInt(c.getColumnIndex("wednesday"));
+            int thu = c.getInt(c.getColumnIndex("thursday"));
+            int fri = c.getInt(c.getColumnIndex("friday"));
+            int sat = c.getInt(c.getColumnIndex("saturday"));
+            int sun = c.getInt(c.getColumnIndex("sunday"));
+            //getting current day from phone calender
+            Calendar calendar = Calendar.getInstance();
+            int day = calendar.get(Calendar.DAY_OF_WEEK); //sun == 1 and sat ==7
+            //
+            switch (day) {
+                case Calendar.SUNDAY:
+                    if (sun == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+                case Calendar.MONDAY:
+                    if (mon == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+                case Calendar.TUESDAY:
+                    if (tue == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+                case Calendar.WEDNESDAY:
+                    if (wed == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+                case Calendar.THURSDAY:
+                    if (thu == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+                case Calendar.FRIDAY:
+                    if (fri == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+                case Calendar.SATURDAY:
+                    if (sat == 1) {
+                        choose(context, mode);
+                    }
+                    break;
+
+            }
+            return  false;
+
+        } else {
+            //one time fire only turning off after time
+            choose(context, mode);
+            return true;
+        }
+
     }
 
     void startapplication(Context context) {
@@ -133,10 +186,20 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     }
     void choose(Context context,int mode){
 
-        if (mode == 0)
-            startapplication(context);
-        else
-            stopapplication(context);
+        System.out.println("in the chooser coose");
+        System.out.println(is_a_function);
+        if(!is_a_function) {
+            if (mode == 0)
+                startapplication(context);
+            else
+                stopapplication(context);
+        }
+        else{
+             System.out.println("in the chooser");
+             FunctionEngine functionEngine = new FunctionEngine(context);
+             if (funcname.equals("wifi")){functionEngine.wifi(mode);}
+
+        }
 
     }
     protected String getTitle(Context context,String  packageName){
