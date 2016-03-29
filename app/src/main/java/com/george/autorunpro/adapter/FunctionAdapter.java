@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,9 +66,10 @@ public class FunctionAdapter extends BaseAdapter {
         int resID = context.getResources().getIdentifier(uri , "drawable", context.getPackageName());
         Drawable icon = ContextCompat.getDrawable(context,resID);
         String funcName = (String) getItem(position);
-        icon.setBounds(0, 0, 40, 40);
+        icon.setBounds(0, 0, 80, 80);
         holder.func.setCompoundDrawables(icon, null, null, null);
         holder.func.setCompoundDrawablePadding(15);
+        holder.func.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
         holder.func.setText(funcName);
 
         return convertView;

@@ -20,19 +20,13 @@
         android:gravity="center"
         android:paddingBottom="50sp" />
 
-    <TextView
-        android:id="@+id/spinner_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:labelFor="@+id/dynamic_spinner"
-        android:layout_below="@+id/title"
-        android:text="Select Appication"/>
-
     <Spinner
         android:id="@+id/dynamic_spinner"
         android:layout_width="match_parent"
-        android:layout_below="@+id/spinner_label"
-        android:layout_height="wrap_content" />
+        android:layout_below="@+id/title"
+        android:layout_height="wrap_content"
+
+        />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/text_layout1"

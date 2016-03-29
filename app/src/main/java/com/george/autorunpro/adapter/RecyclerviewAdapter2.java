@@ -99,15 +99,19 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                 // Snackbar.make(v, "Alarm deleted",Snackbar.LENGTH_LONG).show();
                 // System.out.println("In onbindViewholder temp.id  = "+temp.id);
                 SqlOperator2 sqlOperator =new SqlOperator2(v.getContext());
+                AlarmSet am = new AlarmSet();
                 if(current_data.stop_time.equals("na")){
 
+                    am.CancelAlarm(v.getContext(),current_data.id);
                     sqlOperator.delete(current_data.id);
                     System.out.print("in na deleting id="+current_data.id);
                     //   height = 150;
                 }
                 else {
                     System.out.print("deleting id=" +current_data.id + " and id + 1=" + current_data.id + 1);
+                    am.CancelAlarm(v.getContext(),current_data.id);
                     sqlOperator.delete(current_data.id);
+                    am.CancelAlarm(v.getContext(),current_data.id + 1);
                     sqlOperator.delete((current_data.id + 1));
                     //  height = 200;
                 }

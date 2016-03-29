@@ -127,8 +127,10 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
 
         //function list
         ArrayList<String> functionList = new ArrayList<>(); //new list to add packages
-        functionList.add("wifi");
-        functionList.add("airplane");
+        functionList.add("Wifi");
+        functionList.add("Vibrate Mode");
+        functionList.add("Bluetooth");
+        functionList.add("Silent Mode");
         //spinner
         Spinner funcList = (Spinner) findViewById(R.id.dynamic_spinner);
         funcList.setAdapter(new FunctionAdapter(FunctionAdder.this, functionList));

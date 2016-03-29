@@ -9,9 +9,11 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Camera;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
@@ -195,9 +197,20 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                 stopapplication(context);
         }
         else{
+
              System.out.println("in the chooser");
              FunctionEngine functionEngine = new FunctionEngine(context);
-             if (funcname.equals("wifi")){functionEngine.wifi(mode);}
+             if (funcname.equals("Wifi")){functionEngine.wifi(mode);}
+
+             else if(funcname.equals("Bluetooth")){functionEngine.bluetooth(mode);}
+
+             else if(funcname.equals("Vibrate Mode")){functionEngine.vibrate(mode);}
+
+             else if(funcname.equals("Silent Mode")){functionEngine.silent(mode);}
+
+
+
+
 
         }
 

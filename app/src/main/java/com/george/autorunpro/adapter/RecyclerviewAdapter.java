@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -98,15 +100,19 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 // Snackbar.make(v, "Alarm deleted",Snackbar.LENGTH_LONG).show();
                 // System.out.println("In onbindViewholder temp.id  = "+temp.id);
                 SqlOperator sqlOperator =new SqlOperator(v.getContext());
+                AlarmSet am = new AlarmSet();
                 if(current_data.stop_time.equals("na")){
 
+                    am.CancelAlarm(v.getContext(),current_data.id);
                     sqlOperator.delete(current_data.id);
                     System.out.print("in na deleting id="+current_data.id);
                     //   height = 150;
                 }
                 else {
                     System.out.print("deleting id=" +current_data.id + " and id + 1=" + current_data.id + 1);
+                    am.CancelAlarm(v.getContext(),current_data.id);
                     sqlOperator.delete(current_data.id);
+                    am.CancelAlarm(v.getContext(),current_data.id + 1);
                     sqlOperator.delete((current_data.id + 1));
                     //  height = 200;
                 }
@@ -225,7 +231,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         ImageButton deleteImageButton;
         CardView cardview;
         SwitchCompat swt;
-        public myViewHolder(View itemView) {
+        public myViewHolder(final View itemView) {
             super(itemView);
 
             appname = (TextView) itemView.findViewById(R.id.appname);
@@ -239,6 +245,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     Context context = v.getContext();
                     Intent intent = new Intent(context, EventAdder.class);
                     context.startActivity(intent);

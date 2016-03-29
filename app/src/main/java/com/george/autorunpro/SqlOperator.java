@@ -104,6 +104,7 @@ public class SqlOperator{
     {
         try {
             database.delete(APP_TABLE, "Id="+Id, null);
+
         }
         catch(Exception e) {
             e.printStackTrace(); }
