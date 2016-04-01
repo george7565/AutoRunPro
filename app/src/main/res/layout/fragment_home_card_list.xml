@@ -10,7 +10,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/md_keylines"
+        android:layout_marginRight="@dimen/md_keylines">
 
         <ImageView
             android:id="@+id/card_image"
@@ -23,11 +25,13 @@
         <TextView
             android:id="@+id/appname"
             android:layout_width="wrap_content"
+            android:singleLine="true"
             android:layout_alignParentLeft="true"
             android:layout_height="@dimen/card_title_height"
             android:layout_marginLeft="@dimen/md_keylines"
             android:layout_marginTop="@dimen/md_keylines"
             android:textSize="@dimen/card_heading"
+            android:gravity="center_vertical"
             android:textColor="@android:color/black"
             android:text="AppName"
             android:layout_toLeftOf="@+id/space"
@@ -48,11 +52,10 @@
             android:textOn="on"
             android:button="@null"
             android:layout_height="@dimen/card_title_height"
-            android:layout_marginTop="@dimen/md_keylines"
-            android:layout_alignRight="@+id/share_button"
-            android:layout_alignEnd="@+id/share_button"
-            android:layout_toRightOf="@+id/space2"
-            android:layout_toEndOf="@+id/space2" />
+            android:checked="false"
+            android:layout_above="@+id/padding0"
+            android:layout_alignRight="@+id/delete_button"
+            android:layout_alignEnd="@+id/delete_button" />
 
 
         <TextView
@@ -89,16 +92,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="10:10 AM"
-            android:layout_below="@+id/padding0"
             android:id="@+id/start_time"
             android:textSize="@dimen/card_subheading"
             android:layout_gravity="right|left"
             android:enabled="true"
             android:textColor="@color/dark_grey"
-            android:layout_alignRight="@+id/share_button"
-            android:layout_alignEnd="@+id/share_button"
-            android:layout_alignLeft="@+id/onoffbtn"
-            android:layout_alignStart="@+id/onoffbtn" />
+            android:layout_below="@+id/padding0"
+            android:layout_alignLeft="@+id/stop_time"
+            android:layout_toRightOf="@+id/space1"
+            android:layout_toEndOf="@+id/space1" />
         <TextView
             android:id="@+id/padding1"
             android:layout_width="wrap_content"
@@ -133,9 +135,7 @@
             android:textColor="@color/dark_grey"
             android:id="@+id/stop_time"
             android:text="10:10 AM"
-            android:textSize="@dimen/card_subheading"
-            android:layout_alignRight="@+id/share_button"
-            android:layout_alignEnd="@+id/share_button" />
+            android:textSize="@dimen/card_subheading" />
 
         <TextView
             android:id="@+id/padding2"
@@ -157,16 +157,15 @@
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/padding2" />
 
-        <ImageButton
-            android:id="@+id/share_button"
-            android:layout_width="@dimen/cards_button_width"
-            android:layout_height="@dimen/cards_button_height"
-            android:layout_marginRight="@dimen/md_keylines"
-            android:src="@drawable/ic_share_black_24dp"
-            android:layout_below="@+id/padding2"
-            android:layout_toLeftOf="@id/delete_button"
-            style="?android:attr/borderlessButtonStyle"
-            android:tint="@color/button_grey" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="days"
+            android:textSize="12pt"
+            android:id="@+id/weekday"
+            android:layout_alignBottom="@+id/delete_button"
+            android:layout_alignLeft="@+id/start"
+            android:layout_alignStart="@+id/start"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

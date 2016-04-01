@@ -24,11 +24,13 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 
 import com.george.autorunpro.EventAdder;
+import com.george.autorunpro.MainActivity;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 import com.george.autorunpro.adapter.RecyclerviewAdapter;
 import com.george.autorunpro.model.RecyclerScroll;
+import com.kogitune.activity_transition.ActivityTransitionLauncher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +96,13 @@ public class AppFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(getContext(), EventAdder.class), 121);
+
+                Intent intent = new Intent(getContext(),EventAdder.class);
+                Bundle transitionBundle = ActivityTransitionLauncher.with(getActivity()).from(view).createBundle();
+                intent.putExtras(transitionBundle);
+                startActivityForResult(intent, 121);
+                // you should prevent default activity transition animation
+                getActivity().overridePendingTransition(0, 0);
             }
         });
 
@@ -156,7 +164,7 @@ public class AppFragment extends Fragment {
                 datalist.add(new Pojo_fetch_data(
 
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
-                        title,     // title                      //0th item has id 1
+                        c.getString(c.getColumnIndex("appname")),     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
                         "na",
                         c.getInt(c.getColumnIndex("status"))
@@ -177,7 +185,9 @@ public class AppFragment extends Fragment {
             if(c != null) {
                 c.moveToFirst();
                 int id = c.getInt(c.getColumnIndex("id"));
-                ApplicationInfo applicationInfo = null;
+                String title = c.getString(c.getColumnIndex("appname"));
+
+                /*ApplicationInfo applicationInfo = null;
                 PackageManager packageManager = getContext().getPackageManager();
                 //app name from package name
                 try {
@@ -186,7 +196,8 @@ public class AppFragment extends Fragment {
                 }
                 catch (final PackageManager.NameNotFoundException e) { e.printStackTrace();}
                 final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
-                //app name obtained
+                //app name obtained */
+
                 String start_time = c.getString(c.getColumnIndex("time"));
                 int status = c.getInt(c.getColumnIndex("status"));
                 Pojo_fetch_data new_data;

@@ -71,7 +71,7 @@ public class ApkAdapter extends BaseAdapter {
         appIcon.setBounds(0, 0, 80, 80);
         holder.apkName.setCompoundDrawables(appIcon, null, null, null);
         holder.apkName.setCompoundDrawablePadding(15);
-        holder.apkName.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
+        holder.apkName.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
         holder.apkName.setText(appName);
 
         return convertView;

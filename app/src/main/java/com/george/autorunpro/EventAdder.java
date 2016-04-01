@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,6 +19,8 @@ import android.widget.Spinner;
 
 import com.george.autorunpro.activity.TimePickerFragment;
 import com.george.autorunpro.adapter.ApkAdapter;
+import com.kogitune.activity_transition.ActivityTransition;
+import com.kogitune.activity_transition.ExitActivityTransition;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,12 +43,10 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
     String last_alarm = null;
     int resultcode = 100;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_adder);
-
         start_time = (EditText) findViewById(R.id.starttime);
         stop_time = (EditText) findViewById(R.id.stoptime);
         btn =(Button) findViewById(R.id.btn);
@@ -57,6 +58,9 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         sat = (CheckBox) findViewById(R.id.sat);
         sun = (CheckBox) findViewById(R.id.sun);
         sunb = 0; monb =0 ; tueb = 0 ; wedb=0 ; thub=0; frib=0; satb=0;
+
+        ActivityTransition.with(getIntent()).to(findViewById(R.id.event_adder)).duration(300).start(savedInstanceState);
+
 
         // having onclick listeners for showing timepicker dialogue fragment
        start_time.setOnClickListener(new View.OnClickListener() {
@@ -238,7 +242,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         finish();
 
     }
-
 
 
 }

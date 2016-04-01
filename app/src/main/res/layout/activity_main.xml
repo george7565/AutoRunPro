@@ -7,12 +7,11 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_activity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".MainActivity">
-
-
 
         <LinearLayout
             android:id="@+id/container_toolbar"
@@ -41,6 +40,9 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
+
+
+
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
                 android:layout_width="match_parent"
@@ -48,8 +50,9 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
-
         </FrameLayout>
+
+
 
     </LinearLayout>
     
@@ -62,4 +65,7 @@
         app:headerLayout="@layout/navheader"
         app:menu="@menu/menu_navigation" />
 
+
+
 </android.support.v4.widget.DrawerLayout>
+

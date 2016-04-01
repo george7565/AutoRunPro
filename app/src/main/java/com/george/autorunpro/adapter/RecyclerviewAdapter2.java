@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.UiThread;
@@ -80,12 +81,22 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
         System.out.println("temp.id on onbind view holder ="+current_data.id);
         System.out.println("In onbindViewholder card position = "+position);
         holder.appname.setText(current_data.appname);
-
+        holder.stop_time.setVisibility(View.VISIBLE);
+        holder.stop.setVisibility(View.VISIBLE);
+        holder.stop_padding.setVisibility(View.VISIBLE);
         holder.start_time.setText(time_in_12hr(current_data.start_time));
         if (! current_data.stop_time.equals("na") )
             holder.stop_time.setText(time_in_12hr(current_data.stop_time));
-        else
-            holder.stop_time.setText(current_data.stop_time);
+        else{
+
+            holder.stop_time.setVisibility(View.GONE);
+            holder.stop.setVisibility(View.GONE);
+            holder.stop_padding.setVisibility(View.GONE);
+
+            float height_pix = 160 * Resources.getSystem().getDisplayMetrics().density;
+            holder.cardview.getLayoutParams().height = (int)height_pix;
+        }
+
 
         if(current_data.status == 0)
             holder.swt.setChecked(false);
@@ -197,6 +208,15 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
             }
         });
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, FunctionAdder.class);
+                context.startActivity(intent);
+            }
+        });
+
         holder.itemView.startAnimation(animation);
         lastPosition = position;
     }
@@ -225,7 +245,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
     class myViewHolder extends RecyclerView.ViewHolder{
 
-        TextView appname,start_time,stop_time;
+        TextView appname,start_time,stop_time,stop,stop_padding;
         ImageView img;
         ImageButton deleteImageButton;
         CardView cardview;
@@ -235,35 +255,16 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
             appname = (TextView) itemView.findViewById(R.id.appname);
             start_time = (TextView) itemView.findViewById(R.id.start_time);
+            stop = (TextView) itemView.findViewById(R.id.stop);
+            stop_padding = (TextView) itemView.findViewById(R.id.padding1);
             stop_time = (TextView) itemView.findViewById(R.id.stop_time);
             // img = (ImageView) itemView.findViewById(R.id.card_image);
             cardview =  (CardView) itemView.findViewById(R.id.card_view);
             swt =(SwitchCompat) itemView.findViewById(R.id.onoffbtn);
-            //swt.setOnCheckedChangeListener (this);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, FunctionAdder.class);
-                    context.startActivity(intent);
-                }
-            });
 
             deleteImageButton =
                     (ImageButton) itemView.findViewById(R.id.delete_button);
-
-
-            ImageButton shareImageButton =
-                    (ImageButton) itemView.findViewById(R.id.share_button);
-
-            shareImageButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    Snackbar.make(v, "Added to Favorite",
-                            Snackbar.LENGTH_LONG).show();
-                }
-            });
 
         }
     }

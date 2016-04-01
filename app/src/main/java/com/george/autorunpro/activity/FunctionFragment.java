@@ -33,10 +33,11 @@ import com.george.autorunpro.SqlOperator2;
 import com.george.autorunpro.adapter.RecyclerviewAdapter;
 import com.george.autorunpro.adapter.RecyclerviewAdapter2;
 import com.george.autorunpro.model.RecyclerScroll;
-
+import com.kogitune.activity_transition.ActivityTransitionLauncher;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import me.yugy.github.reveallayout.RevealLayout;
 
 
 /**
@@ -91,13 +92,27 @@ public class FunctionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View layout = inflater.inflate(R.layout.fragment_function, container, false);
+        final View layout = inflater.inflate(R.layout.fragment_function, container, false);
         final FloatingActionButton fab = (FloatingActionButton) layout.findViewById(R.id.fab2);
+        final RevealLayout mRevealLayout = (RevealLayout) layout.findViewById(R.id.reveal_layout);
+        final  View mRevealView = layout.findViewById(R.id.reveal_view);
+        final View child = inflater.inflate(R.layout.event_adder,container, false);
+
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                startActivityForResult(new Intent(getContext(), FunctionAdder.class), 123);
+                Intent intent = new Intent(getContext(),FunctionAdder.class);
+                Bundle transitionBundle = ActivityTransitionLauncher.with(getActivity()).from(view).createBundle();
+                intent.putExtras(transitionBundle);
+                startActivityForResult(intent, 123);
+                // you should prevent default activity transition animation
+                getActivity().overridePendingTransition(0, 0);
+
+
+
+
             }
         });
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.UiThread;
@@ -50,11 +51,13 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
     List<Pojo_fetch_data> datalist = Collections.emptyList();
     private int lastPosition = -1;
     private RecyclerView recyclerView;
+    private Context context;
 
     public RecyclerviewAdapter(Context context,List<Pojo_fetch_data> datalist,RecyclerView recyclerView){
         inflator = LayoutInflater.from(context);
         this.datalist = datalist;
         this.recyclerView = recyclerView;
+        this.context = context;
 
     }
     @Override
@@ -79,14 +82,39 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         final Pojo_fetch_data current_data = this.datalist.get(position);
         System.out.println("temp.id on onbind view holder ="+current_data.id);
         System.out.println("In onbindViewholder card position = "+position);
-        holder.appname.setText(current_data.appname);
 
+        //setting icon and appname from package name start
 
+                ApplicationInfo applicationInfo = null;
+                PackageManager packageManager = context.getPackageManager();
+                //app name from package name
+                try {
+                    applicationInfo = packageManager.getApplicationInfo(current_data.appname, 0);
+
+                }
+                catch (final PackageManager.NameNotFoundException e) { e.printStackTrace();}
+                final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
+                final Drawable icon = packageManager.getApplicationIcon(applicationInfo);
+                icon.setBounds(0, 0, 80, 80);
+                holder.appname.setCompoundDrawables(icon, null, null, null);
+                holder.appname.setCompoundDrawablePadding((int)dp_to_px(7));
+                holder.appname.setText(title);
+
+        //setting appname and icon end
+
+        holder.stop_time.setVisibility(View.VISIBLE);
+        holder.stop.setVisibility(View.VISIBLE);
+        holder.stop_padding.setVisibility(View.VISIBLE);
         holder.start_time.setText(time_in_12hr(current_data.start_time));
         if (! current_data.stop_time.equals("na") )
             holder.stop_time.setText(time_in_12hr(current_data.stop_time));
-        else
-            holder.stop_time.setText(current_data.stop_time);
+        else{
+            holder.stop_time.setVisibility(View.GONE);
+            holder.stop.setVisibility(View.GONE);
+            holder.stop_padding.setVisibility(View.GONE);
+
+            holder.cardview.getLayoutParams().height = (int)dp_to_px(160);
+        }
 
         if(current_data.status == 0)
             holder.swt.setChecked(false);
@@ -197,6 +225,15 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 }
             }
         });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Context context = v.getContext();
+                Intent intent = new Intent(context, EventAdder.class);
+                //context.startActivity(intent);
+            }
+        });
 
         holder.itemView.startAnimation(animation);
         lastPosition = position;
@@ -226,52 +263,29 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
     class myViewHolder extends RecyclerView.ViewHolder{
 
-        TextView appname,start_time,stop_time;
+        TextView appname,start_time,stop_time,stop,stop_padding,weekdays;
         ImageView img;
         ImageButton deleteImageButton;
         CardView cardview;
         SwitchCompat swt;
+
         public myViewHolder(final View itemView) {
             super(itemView);
 
             appname = (TextView) itemView.findViewById(R.id.appname);
             start_time = (TextView) itemView.findViewById(R.id.start_time);
             stop_time = (TextView) itemView.findViewById(R.id.stop_time);
-            // img = (ImageView) itemView.findViewById(R.id.card_image);
+            stop = (TextView) itemView.findViewById(R.id.stop);
+            stop_padding = (TextView) itemView.findViewById(R.id.padding1);
+            weekdays = (TextView) itemView.findViewById(R.id.weekday);
             cardview =  (CardView) itemView.findViewById(R.id.card_view);
             swt =(SwitchCompat) itemView.findViewById(R.id.onoffbtn);
-            //swt.setOnCheckedChangeListener (this);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, EventAdder.class);
-                    context.startActivity(intent);
-                }
-            });
-
-            deleteImageButton =
-                    (ImageButton) itemView.findViewById(R.id.delete_button);
-
-
-            ImageButton shareImageButton =
-                    (ImageButton) itemView.findViewById(R.id.share_button);
-
-            shareImageButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    Snackbar.make(v, "Added to Favorite",
-                            Snackbar.LENGTH_LONG).show();
-                }
-            });
+            deleteImageButton = (ImageButton) itemView.findViewById(R.id.delete_button);
 
         }
     }
 
    private String time_in_12hr(String time){
-
 
        try{
            final SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
@@ -283,6 +297,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
            return time;
        }
    }
+
     protected  Calendar getCalender(String time){
 
         String[] splited = time.split(":");
@@ -299,4 +314,9 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         }
         return calendar;
     }
+   protected  float dp_to_px(int dp){
+
+       return dp * context.getResources().getDisplayMetrics().density;
+   }
+
 }//adapter end

@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.george.autorunpro.activity.TimePickerFragment;
 import com.george.autorunpro.adapter.FunctionAdapter;
+import com.kogitune.activity_transition.ActivityTransition;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,9 +53,10 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
         sun = (CheckBox) findViewById(R.id.sun);
         sunb = 0; monb =0 ; tueb = 0 ; wedb=0 ; thub=0; frib=0; satb=0;
 
+        ActivityTransition.with(getIntent()).to(findViewById(R.id.event_adder)).duration(300).start(savedInstanceState);
         // having onclick listeners for showing timepicker dialogue fragment
         TextView title = (TextView) findViewById(R.id.title);
-        title.setText("on function timer");
+        title.setText("Add Function Timer");
 
         start_time.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

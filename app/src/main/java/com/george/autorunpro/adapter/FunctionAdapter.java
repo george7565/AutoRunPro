@@ -69,9 +69,8 @@ public class FunctionAdapter extends BaseAdapter {
         icon.setBounds(0, 0, 80, 80);
         holder.func.setCompoundDrawables(icon, null, null, null);
         holder.func.setCompoundDrawablePadding(15);
-        holder.func.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
+        holder.func.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
         holder.func.setText(funcName);
-
         return convertView;
     }
 }
