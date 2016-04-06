@@ -10,12 +10,14 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,11 +53,12 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
     List<Pojo_fetch_data> datalist = Collections.emptyList();
     private int lastPosition = -1;
     private RecyclerView recyclerView;
-
+    private Context context;
     public RecyclerviewAdapter2(Context context,List<Pojo_fetch_data> datalist,RecyclerView recyclerView){
         inflator = LayoutInflater.from(context);
         this.datalist = datalist;
         this.recyclerView = recyclerView;
+        this.context = context;
 
     }
     @Override
@@ -80,7 +83,17 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
         final Pojo_fetch_data current_data = this.datalist.get(position);
         System.out.println("temp.id on onbind view holder ="+current_data.id);
         System.out.println("In onbindViewholder card position = "+position);
+        //setting text and icon to function
+        String icon_name = getIcon_name(current_data.appname);
+        int resID = context.getResources().getIdentifier(icon_name , "drawable", context.getPackageName());
+        Drawable icon = ContextCompat.getDrawable(context,resID);
+
+        icon.setBounds(0, 0, 80, 80);
+        holder.appname.setCompoundDrawables(icon, null, null, null);
+        holder.appname.setCompoundDrawablePadding((int)dp_to_px(7));
         holder.appname.setText(current_data.appname);
+        //setting end
+
         holder.stop_time.setVisibility(View.VISIBLE);
         holder.stop.setVisibility(View.VISIBLE);
         holder.stop_padding.setVisibility(View.VISIBLE);
@@ -92,11 +105,9 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
             holder.stop_time.setVisibility(View.GONE);
             holder.stop.setVisibility(View.GONE);
             holder.stop_padding.setVisibility(View.GONE);
-
-            float height_pix = 160 * Resources.getSystem().getDisplayMetrics().density;
-            holder.cardview.getLayoutParams().height = (int)height_pix;
+            holder.cardview.getLayoutParams().height = (int)dp_to_px(160);
         }
-
+        holder.weekdays.setText(current_data.weekday_status);
 
         if(current_data.status == 0)
             holder.swt.setChecked(false);
@@ -245,7 +256,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
     class myViewHolder extends RecyclerView.ViewHolder{
 
-        TextView appname,start_time,stop_time,stop,stop_padding;
+        TextView appname,start_time,stop_time,stop,stop_padding,weekdays;
         ImageView img;
         ImageButton deleteImageButton;
         CardView cardview;
@@ -257,6 +268,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
             start_time = (TextView) itemView.findViewById(R.id.start_time);
             stop = (TextView) itemView.findViewById(R.id.stop);
             stop_padding = (TextView) itemView.findViewById(R.id.padding1);
+            weekdays = (TextView) itemView.findViewById(R.id.weekday);
             stop_time = (TextView) itemView.findViewById(R.id.stop_time);
             // img = (ImageView) itemView.findViewById(R.id.card_image);
             cardview =  (CardView) itemView.findViewById(R.id.card_view);
@@ -297,5 +309,22 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
             calendar.add(Calendar.DATE, 1);
         }
         return calendar;
+    }
+    protected  float dp_to_px(int dp){
+
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
+    private String getIcon_name(String funcname){
+        String name="";
+
+        if(funcname.equals("Wifi"))
+            name = "func1";
+        else if(funcname.equals("Vibrate Mode"))
+            name = "func2";
+        else if(funcname.equals("Bluetooth"))
+            name = "func3";
+        else if(funcname.equals("Silent Mode"))
+            name = "func4";
+        return name;
     }
 }//adapter end

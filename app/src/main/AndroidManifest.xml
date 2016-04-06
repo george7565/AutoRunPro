@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.george.autorunpro">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -15,6 +16,8 @@
         android:protectionLevel="normal" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
 
 
     <application
@@ -34,7 +37,14 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".AlarmManagerBroadcastReceiver" />
+        <receiver
+            android:name=".AlarmManagerBroadcastReceiver"
+            android:enabled="true">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+        </receiver>
 
         <activity android:name=".EventAdder"
             android:screenOrientation="portrait"

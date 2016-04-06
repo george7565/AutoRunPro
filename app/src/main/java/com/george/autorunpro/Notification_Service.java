@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -19,7 +21,7 @@ public class Notification_Service {
     private String title;
     private String content;
     //setting vibrating pattern
-    private static final long[] THREE_CYCLES = new long[] { 100, 1000, 1000,  1000, 1000, 1000 };
+    private static final long[] CYCLES = new long[] { 100, 500, 500,  500};
 
     public Notification_Service(Context context, String title, String content){
 
@@ -35,7 +37,7 @@ public class Notification_Service {
                Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_profile);
                long when = System.currentTimeMillis();
                Intent notificationIntent = new Intent();
-               notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+               notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         /*create new task for each notification with pending intent so we set Intent.FLAG_ACTIVITY_NEW_TASK */
                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent,0 );
         /*get the system service that manage notification NotificationManager*/
@@ -50,7 +52,9 @@ public class Notification_Service {
                        .setAutoCancel(true)
                        .setTicker(content)
                        .setLargeIcon(largeIcon)
-                       .setVibrate(THREE_CYCLES)
+                       .setVibrate(CYCLES)
+                       .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                       .setLights(Color.BLUE,1000,1000)
                        .setContentIntent(pendingIntent);
         /*sending notification to system. Here we use unique id (when)for making different each notification
          * if we use same id, then first notification replace by the last notification*/

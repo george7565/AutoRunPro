@@ -35,6 +35,7 @@ public class SqlOperator{
     public SqlOperator(Context context){
         dbHelper = new DatabaseParent(context);
         database = dbHelper.getWritableDatabase();
+
     }
 
 
@@ -109,5 +110,10 @@ public class SqlOperator{
         catch(Exception e) {
             e.printStackTrace(); }
     }
+
+   public void close(){
+       dbHelper.close();
+       database.close();
+   }
 
 }

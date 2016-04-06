@@ -109,4 +109,9 @@ public class SqlOperator2{
             e.printStackTrace(); }
     }
 
+    public void close(){
+        dbHelper.close();
+        database.close();
+    }
+
 }

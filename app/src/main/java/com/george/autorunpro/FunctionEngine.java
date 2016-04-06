@@ -23,16 +23,17 @@ public class FunctionEngine {
 
     }
 
-    public void wifi(int mode){
+    public boolean wifi(int mode){
 
         WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
         if(mode == ON){
             System.out.println("wifi on");
-            wifiManager.setWifiEnabled(true);
+            return  wifiManager.setWifiEnabled(true);
+
         }
         else{
             System.out.println("wifi off");
-            wifiManager.setWifiEnabled(false);
+            return wifiManager.setWifiEnabled(false);
         }
     }//wifi close
 
@@ -58,25 +59,44 @@ public class FunctionEngine {
        vibrate = 1;
        silent = 0;
     */
-    public void silent(int mode){
+    public boolean silent(int mode){
 
         AudioManager mAudioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         if(mode == ON){
-            mAudioManager.setRingerMode(0);
+            try {
+                mAudioManager.setRingerMode(0);
+                return true;
+            }catch (Exception e){
+                return false;
+            }
         }else{
+            try{
             mAudioManager.setRingerMode(2);
-
+                return true;
+            }catch (Exception e){
+                return false;
+            }
         }
 
     }
 
-    public void vibrate(int mode){
+    public boolean vibrate(int mode){
 
         AudioManager mAudioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         if(mode == ON){
-            mAudioManager.setRingerMode(1);
+            try {
+                mAudioManager.setRingerMode(1);
+                return true;
+            }catch (Exception e){
+                return false;
+            }
         }else{
-            mAudioManager.setRingerMode(2);
+            try {
+                mAudioManager.setRingerMode(2);
+                return true;
+            }catch (Exception e){
+                return false;
+            }
 
         }
 

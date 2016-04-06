@@ -100,6 +100,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 holder.appname.setCompoundDrawablePadding((int)dp_to_px(7));
                 holder.appname.setText(title);
 
+
         //setting appname and icon end
 
         holder.stop_time.setVisibility(View.VISIBLE);
@@ -115,6 +116,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
             holder.cardview.getLayoutParams().height = (int)dp_to_px(160);
         }
+        holder.weekdays.setText(current_data.weekday_status);
 
         if(current_data.status == 0)
             holder.swt.setChecked(false);

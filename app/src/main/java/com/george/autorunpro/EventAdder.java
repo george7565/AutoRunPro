@@ -231,6 +231,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         SqlOperator sqlOperator = new SqlOperator(getApplicationContext());
         sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
         req_id = sqlOperator.getNextid();
+        sqlOperator.close();
         return true;
     }
     public void return_to_fragment(){
@@ -242,6 +243,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         finish();
 
     }
+
 
 
 }

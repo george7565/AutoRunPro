@@ -155,14 +155,15 @@ public class FunctionFragment extends Fragment {
                     continue;
                 }
 
-                //final Drawable icon = packageManager.getApplicationIcon(applicationInfo);
+                final String weekday_status = getWeekStatus(c);
                 datalist.add(new Pojo_fetch_data(
 
                         c.getInt(c.getColumnIndex("id")),        // datalist starts at index 0 //database id starts at 1
                         c.getString(c.getColumnIndex("funcname")),     // title                      //0th item has id 1
                         c.getString(c.getColumnIndex("time")),
                         "na",
-                        c.getInt(c.getColumnIndex("status"))
+                        c.getInt(c.getColumnIndex("status")),
+                        weekday_status
                 ));
             } while (c.moveToNext());
             c.close();
@@ -182,16 +183,17 @@ public class FunctionFragment extends Fragment {
                 int id = c.getInt(c.getColumnIndex("id"));
                 String start_time = c.getString(c.getColumnIndex("time"));
                 int status = c.getInt(c.getColumnIndex("status"));
+                String week_status = getWeekStatus(c);
                 String name = c.getString(c.getColumnIndex("funcname"));
                 Pojo_fetch_data new_data;
                 if (alarmtype.equals("mono")) {
-                    new_data = new Pojo_fetch_data(id, name, start_time, "na", status);
+                    new_data = new Pojo_fetch_data(id, name, start_time, "na", status,week_status);
                 } else {
                     //start time time is the 2nd row as order is desc
                     c.moveToNext();
                     String stop_time = start_time;
                     start_time = c.getString(c.getColumnIndex("time"));//start time
-                    new_data = new Pojo_fetch_data(id, name, start_time, stop_time, status);
+                    new_data = new Pojo_fetch_data(id, name, start_time, stop_time, status,week_status);
 
                 }
                 recyclerviewAdapter.addData(new_data);
@@ -201,5 +203,31 @@ public class FunctionFragment extends Fragment {
         System.out.print("running onactivity");
         super.onActivityResult(requestCode, resultCode, data);
     }//onactivity result end
+
+    public static String getWeekStatus(Cursor c){
+
+        String status = "Runs: ";
+
+        if(c.getInt(c.getColumnIndex("sunday")) == 1)
+            status += "Sun ";
+        if(c.getInt(c.getColumnIndex("monday")) == 1)
+            status += "Mon ";
+        if(c.getInt(c.getColumnIndex("tuesday")) == 1)
+            status += "Tue ";
+        if(c.getInt(c.getColumnIndex("wednesday")) == 1)
+            status += "Wed ";
+        if(c.getInt(c.getColumnIndex("thursday")) == 1)
+            status += "Thu ";
+        if(c.getInt(c.getColumnIndex("friday")) == 1)
+            status += "Fri ";
+        if(c.getInt(c.getColumnIndex("saturday")) == 1)
+            status += "Sat ";
+        if(status.equals("Runs: ")){
+            status += "Today ";
+        }else if(status.equals("Runs: Sun Mon Tue Wed Thu Fri Sat "))
+            status ="Runs: Weekdays";
+        status.replaceFirst("\\s+$", "");
+        return status;
+    }
 
 } //fragment close
