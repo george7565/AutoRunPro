@@ -209,6 +209,7 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
         SqlOperator2 sqlOperator = new SqlOperator2(getApplicationContext());
         sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
         req_id = sqlOperator.getNextid();
+        sqlOperator.close();
         return true;
     }
 

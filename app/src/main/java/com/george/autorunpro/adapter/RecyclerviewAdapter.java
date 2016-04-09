@@ -98,6 +98,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 icon.setBounds(0, 0, 80, 80);
                 holder.appname.setCompoundDrawables(icon, null, null, null);
                 holder.appname.setCompoundDrawablePadding((int)dp_to_px(7));
+                holder.cardview.getLayoutParams().height = (int)dp_to_px(200);
                 holder.appname.setText(title);
 
 
@@ -139,7 +140,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                     //   height = 150;
                 }
                 else {
-                    System.out.print("deleting id=" +current_data.id + " and id + 1=" + current_data.id + 1);
+                    System.out.println("deleting id=" +current_data.id + " and id + 1=" + current_data.id + 1);
                     am.CancelAlarm(v.getContext(),current_data.id);
                     sqlOperator.delete(current_data.id);
                     am.CancelAlarm(v.getContext(),current_data.id + 1);
@@ -150,7 +151,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 //System.out.println("position = "+position);
                 //System.out.println(datalist.get(position).appname);
                 removeData(holder.getAdapterPosition(),datalist);
-
+                sqlOperator.close();
             }
         });
         holder.swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -178,7 +179,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
                                 }
                                 datalist.get(position).status = 0;current_data.status = 0;
-                                Snackbar.make(buttonView, "App Timer Off",
+                                sqlOperator.close();
+                                Snackbar.make(holder.itemView, "App Timer Off",
                                         Snackbar.LENGTH_LONG).show();
                             }
 
@@ -215,7 +217,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                                         am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
                                 }
                                 datalist.get(position).status = 1;current_data.status = 1;
-                                Snackbar.make(buttonView, "App Timer On",
+                                sqlOperator.close();
+                                Snackbar.make(holder.itemView, "App Timer On",
                                         Snackbar.LENGTH_LONG).show();
                             }
 

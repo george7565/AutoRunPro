@@ -1,6 +1,7 @@
 package com.george.autorunpro;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.george.autorunpro.activity.AppFragment;
 import com.george.autorunpro.activity.FunctionFragment;

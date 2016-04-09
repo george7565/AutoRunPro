@@ -91,6 +91,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
         icon.setBounds(0, 0, 80, 80);
         holder.appname.setCompoundDrawables(icon, null, null, null);
         holder.appname.setCompoundDrawablePadding((int)dp_to_px(7));
+        holder.cardview.getLayoutParams().height = (int)dp_to_px(200);
         holder.appname.setText(current_data.appname);
         //setting end
 
@@ -141,7 +142,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                 //System.out.println("position = "+position);
                 //System.out.println(datalist.get(position).appname);
                 removeData(holder.getAdapterPosition(),datalist);
-
+                sqlOperator.close();
             }
         });
         holder.swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -169,7 +170,8 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
                                 }
                                 datalist.get(position).status = 0;current_data.status = 0;
-                                Snackbar.make(buttonView, current_data.appname +"timer switched Off",
+                                sqlOperator.close();
+                                Snackbar.make(holder.itemView, current_data.appname +" timer switched Off",
                                         Snackbar.LENGTH_LONG).show();
                             }
 
@@ -206,7 +208,8 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                                         am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
                                 }
                                 datalist.get(position).status = 1;current_data.status = 1;
-                                Snackbar.make(buttonView, current_data.appname+" timer switched On",
+                                sqlOperator.close();
+                                Snackbar.make(holder.itemView, current_data.appname+" timer switched On",
                                         Snackbar.LENGTH_LONG).show();
                             }
 

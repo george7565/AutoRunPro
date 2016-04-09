@@ -4,27 +4,23 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Camera;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.KeyEvent;
+
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
@@ -33,7 +29,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     int id;
     String packageName,type,funcname;
     boolean is_a_function;
-    ActivityManager am;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -69,6 +65,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     }
 
                     c.close();
+                    sqlOperator.close();
                 } catch (Exception e) {
                     Log.i("Cursor exception: ", e.toString());
                 }
@@ -92,6 +89,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     }
 
                     c.close();
+                    sqlOperator.close();
                 } catch (Exception e) {
                     Log.i("Cursor exception: ", e.toString());
                 }
@@ -185,29 +183,53 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     void stopapplication(Context context){
        //checking app is in foreground,then only a stop is needed
         //stop refers to minimising as android dont like killing apps
-        am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> procInfos = am.getRunningAppProcesses();
         Log.i("on reciever","in the stop application");
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             Log.i("For less than lollipop","hhhh");
-            for(ActivityManager.RunningAppProcessInfo appProcess : procInfos) {
-                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    if (appProcess.processName.equals(packageName)) {
+            @SuppressWarnings("Deprecated")
+            ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+            // The first in the list of RunningTasks is always the foreground task.
+            ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
+            String foregroundTaskPackageName = foregroundTaskInfo .topActivity.getPackageName();
+
+                    if (foregroundTaskPackageName.equals(packageName)) {
                         Intent startMain = new Intent(Intent.ACTION_MAIN);
                         startMain.addCategory(Intent.CATEGORY_HOME);
                         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(startMain);
-                        am.killBackgroundProcesses(packageName);
-
                         Notification_Service notification_service = new Notification_Service(context, "AutoRun Pro", "Stopped " + getTitle(context, packageName) + " for you");
                         notification_service.showNotification();
+                        am.killBackgroundProcesses(packageName);
+                        AudioManager manager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 
+                        // Request audio focus for playback
+                        int result = manager.requestAudioFocus(afChangeListener,
+                                // Use the music stream.
+                                AudioManager.STREAM_MUSIC,
+                                // Request permanent focus.
+                                AudioManager.AUDIOFOCUS_GAIN);
+
+                        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                            Log.i("inside stop","audio focus obtained");
+                            // Start playback.
+                        }
+
+
+            /*
+                        if(manager.isMusicActive())
+                        {
+                            // do something - or do it not
+                            //Intent i = new Intent("com.android.music.musicservicecommand");
+                            i.putExtra("command" , "stop" );
+                            context.getApplicationContext().sendBroadcast(i);
+                        }*/
                     }
-                    //Log.i("Foreground App", appProcess.processName);
-                }
+
             }
 
-            }else{
+        else
+        {
             Log.i("For lollipop and above","hhh");
             @SuppressWarnings("WrongConstant")
             UsageStatsManager usm = (UsageStatsManager) context.getSystemService("usagestats");
@@ -228,16 +250,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                         startMain.addCategory(Intent.CATEGORY_HOME);
                         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(startMain);
-                        am.killBackgroundProcesses(packageName);
-
                         Notification_Service notification_service = new Notification_Service(context, "AutoRun Pro", "Stopped " + getTitle(context, packageName) + " for you");
                         notification_service.showNotification();
                     }
                 }
             }
 
-
-            }
+        }
 
 
 
@@ -315,12 +334,26 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             applicationInfo = packageManager.getApplicationInfo(packageName, 0);
 
         }
-        catch (final PackageManager.NameNotFoundException e) { }
-        final String title = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
-        return title;
+        catch (final PackageManager.NameNotFoundException e) { e.printStackTrace();}
+
+        return (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
     }
 
 
+    AudioManager.OnAudioFocusChangeListener afChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+                public void onAudioFocusChange(int focusChange) {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                        // Pause playback
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        // Resume playback
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        //am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
+                        //am.abandonAudioFocus(afChangeListener);
+                        // Stop playback
+                    }
+                }
+            };
 
 
 }

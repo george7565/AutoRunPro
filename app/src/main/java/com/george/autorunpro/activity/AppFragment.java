@@ -173,6 +173,7 @@ public class AppFragment extends Fragment {
                 ));
             } while (c.moveToNext());
             c.close();
+            sqlOperator.close();
         }
 
         return datalist;
@@ -202,6 +203,7 @@ public class AppFragment extends Fragment {
                     new_data = new Pojo_fetch_data(id, title, start_time, stop_time, status,week_status);
 
                 }
+                c.close();
                 recyclerviewAdapter.addData(new_data);
             }
             System.out.print("running onactivity");
