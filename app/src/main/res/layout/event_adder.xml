@@ -16,7 +16,6 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:text="Add Applications Timer"
-        android:fontFamily="cursive"
         android:textStyle="bold"
         android:gravity="center"
         android:paddingBottom="50sp" />

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -36,7 +37,6 @@ import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 import com.george.autorunpro.SqlOperator2;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
@@ -54,11 +54,15 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
     private int lastPosition = -1;
     private RecyclerView recyclerView;
     private Context context;
+    SqlOperator2 sqlOperator;
+    AlarmSet am = new AlarmSet();
+
     public RecyclerviewAdapter2(Context context,List<Pojo_fetch_data> datalist,RecyclerView recyclerView){
         inflator = LayoutInflater.from(context);
         this.datalist = datalist;
         this.recyclerView = recyclerView;
         this.context = context;
+        this.sqlOperator = new SqlOperator2(context);
 
     }
     @Override
@@ -121,28 +125,28 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
                 // Snackbar.make(v, "Alarm deleted",Snackbar.LENGTH_LONG).show();
                 // System.out.println("In onbindViewholder temp.id  = "+temp.id);
-                SqlOperator2 sqlOperator =new SqlOperator2(v.getContext());
-                AlarmSet am = new AlarmSet();
+                String[] id = new String[2];
                 if(current_data.stop_time.equals("na")){
 
+                    id[0] = Integer.toString(current_data.id);
                     am.CancelAlarm(v.getContext(),current_data.id);
-                    sqlOperator.delete(current_data.id);
+                    sqlOperator.delete(id);
                     System.out.print("in na deleting id="+current_data.id);
                     //   height = 150;
                 }
                 else {
-                    System.out.print("deleting id=" +current_data.id + " and id + 1=" + current_data.id + 1);
+                    System.out.println("deleting id=" +current_data.id + " and id + 1=" + (current_data.id+1));
+                    id[0] = Integer.toString(current_data.id);
+                    id[1] = Integer.toString(current_data.id+1);
                     am.CancelAlarm(v.getContext(),current_data.id);
-                    sqlOperator.delete(current_data.id);
                     am.CancelAlarm(v.getContext(),current_data.id + 1);
-                    sqlOperator.delete((current_data.id + 1));
+                    sqlOperator.delete(id);
                     //  height = 200;
                 }
                 System.out.println("inside onclick = "+current_data.id);
                 //System.out.println("position = "+position);
                 //System.out.println(datalist.get(position).appname);
                 removeData(holder.getAdapterPosition(),datalist);
-                sqlOperator.close();
             }
         });
         holder.swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -156,11 +160,8 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                             Log.i("TAG","not-checked");
                             if(current_data.status == 1){
 
-                                SqlOperator2 sqlOperator = new SqlOperator2(buttonView.getContext());
                                 ContentValues cv = new ContentValues();
                                 cv.put("status",0);
-                                AlarmSet am = new AlarmSet();
-
                                 sqlOperator.updateRecord(current_data.id,cv);
                                 am.CancelAlarm(buttonView.getContext(),current_data.id);
                                 if(!current_data.stop_time.equals("na")){
@@ -170,7 +171,6 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
                                 }
                                 datalist.get(position).status = 0;current_data.status = 0;
-                                sqlOperator.close();
                                 Snackbar.make(holder.itemView, current_data.appname +" timer switched Off",
                                         Snackbar.LENGTH_LONG).show();
                             }
@@ -179,7 +179,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                         } else {
                             Log.i("TAG","checked");
                             if(current_data.status == 0){
-                                SqlOperator2 sqlOperator = new SqlOperator2(buttonView.getContext());
+
                                 ContentValues cv = new ContentValues();
                                 cv.put("status",1);
                                 sqlOperator.updateRecord(current_data.id,cv);
@@ -192,7 +192,6 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
                                 //calender setup end
                                 Calendar calendar = getCalender(current_data.start_time);
-                                AlarmSet am = new AlarmSet();
                                 if (c != null)
                                     am.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id);
                                 else
@@ -208,7 +207,6 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                                         am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
                                 }
                                 datalist.get(position).status = 1;current_data.status = 1;
-                                sqlOperator.close();
                                 Snackbar.make(holder.itemView, current_data.appname+" timer switched On",
                                         Snackbar.LENGTH_LONG).show();
                             }
@@ -225,9 +223,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, FunctionAdder.class);
-                context.startActivity(intent);
+
             }
         });
 

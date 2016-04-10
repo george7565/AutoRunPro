@@ -1,44 +1,28 @@
 package com.george.autorunpro.activity;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.TextView;
-
-import com.george.autorunpro.EventAdder;
 import com.george.autorunpro.FunctionAdder;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
-import com.george.autorunpro.SqlOperator;
 import com.george.autorunpro.SqlOperator2;
-import com.george.autorunpro.adapter.RecyclerviewAdapter;
 import com.george.autorunpro.adapter.RecyclerviewAdapter2;
 import com.george.autorunpro.model.RecyclerScroll;
-import com.kogitune.activity_transition.ActivityTransitionLauncher;
 import java.util.ArrayList;
 import java.util.List;
-
-import me.yugy.github.reveallayout.RevealLayout;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -94,9 +78,6 @@ public class FunctionFragment extends Fragment {
 
         final View layout = inflater.inflate(R.layout.fragment_function, container, false);
         final FloatingActionButton fab = (FloatingActionButton) layout.findViewById(R.id.fab2);
-        final RevealLayout mRevealLayout = (RevealLayout) layout.findViewById(R.id.reveal_layout);
-        final  View mRevealView = layout.findViewById(R.id.reveal_view);
-        final View child = inflater.inflate(R.layout.event_adder,container, false);
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -104,14 +85,7 @@ public class FunctionFragment extends Fragment {
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(),FunctionAdder.class);
-                Bundle transitionBundle = ActivityTransitionLauncher.with(getActivity()).from(view).createBundle();
-                intent.putExtras(transitionBundle);
                 startActivityForResult(intent, 123);
-                // you should prevent default activity transition animation
-                getActivity().overridePendingTransition(0, 0);
-
-
-
 
             }
         });
@@ -167,7 +141,6 @@ public class FunctionFragment extends Fragment {
                 ));
             } while (c.moveToNext());
             c.close();
-            sqlOperator.close();
         }
 
         return datalist;
@@ -194,6 +167,7 @@ public class FunctionFragment extends Fragment {
                     c.moveToNext();
                     String stop_time = start_time;
                     start_time = c.getString(c.getColumnIndex("time"));//start time
+                    id = c.getInt(c.getColumnIndex("id"));
                     new_data = new Pojo_fetch_data(id, name, start_time, stop_time, status,week_status);
 
                 }
@@ -228,7 +202,7 @@ public class FunctionFragment extends Fragment {
             status += "Today ";
         }else if(status.equals("Runs: Sun Mon Tue Wed Thu Fri Sat "))
             status ="Runs: Weekdays";
-        status.replaceFirst("\\s+$", "");
+        status = status.replaceFirst("\\s+$", "");
         return status;
     }
 

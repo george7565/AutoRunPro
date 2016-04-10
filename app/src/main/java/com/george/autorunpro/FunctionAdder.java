@@ -13,11 +13,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.george.autorunpro.activity.TimePickerFragment;
 import com.george.autorunpro.adapter.FunctionAdapter;
-import com.kogitune.activity_transition.ActivityTransition;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,7 +50,7 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
         sun = (CheckBox) findViewById(R.id.sun);
         sunb = 0; monb =0 ; tueb = 0 ; wedb=0 ; thub=0; frib=0; satb=0;
 
-        ActivityTransition.with(getIntent()).to(findViewById(R.id.event_adder)).duration(300).start(savedInstanceState);
+
         // having onclick listeners for showing timepicker dialogue fragment
         TextView title = (TextView) findViewById(R.id.title);
         title.setText("Add Function Timer");
@@ -118,7 +115,6 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
                         last_alarm = "dual";
 
                     }
-
 
                     Snackbar.make(v, "Alarm Added!",
                             Snackbar.LENGTH_LONG).show();
@@ -209,7 +205,6 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
         SqlOperator2 sqlOperator = new SqlOperator2(getApplicationContext());
         sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
         req_id = sqlOperator.getNextid();
-        sqlOperator.close();
         return true;
     }
 

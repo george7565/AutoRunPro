@@ -33,7 +33,7 @@ public class SqlOperator2{
      * @param
      */
     public SqlOperator2(Context context){
-        dbHelper = new DatabaseParent(context);
+        dbHelper = DatabaseParent.getInstance(context);
         database = dbHelper.getWritableDatabase();
     }
 
@@ -98,20 +98,13 @@ public class SqlOperator2{
         return true;
     }
 
-
-
-    public void delete(int Id)
+    public void delete(String[] Id)
     {
         try {
-            database.delete(APP_TABLE, "Id="+Id, null);
+            database.delete(APP_TABLE, "id IN (?, ?)", Id);
         }
         catch(Exception e) {
             e.printStackTrace(); }
-    }
-
-    public void close(){
-        dbHelper.close();
-        database.close();
     }
 
 }

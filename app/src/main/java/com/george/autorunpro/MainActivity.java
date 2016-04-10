@@ -69,8 +69,7 @@ public class MainActivity extends AppCompatActivity{
                         menuItem.setChecked(true);
                          int id = menuItem.getItemId();
                         if (id == R.id.one) {
-                            Intent intent = new Intent(getApplicationContext(), EventAdder.class);
-                            startActivity(intent);
+
                         }
 
                         // Closing drawer on item click

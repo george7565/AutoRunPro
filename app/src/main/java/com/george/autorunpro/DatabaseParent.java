@@ -11,8 +11,19 @@ import android.util.Log;
 public class DatabaseParent extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "AutorunPro";
-
+    private static DatabaseParent sInstance;
     private static final int DATABASE_VERSION = 2;
+
+    public static synchronized DatabaseParent getInstance(Context context) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+            sInstance = new DatabaseParent(context.getApplicationContext());
+        }
+        return sInstance;
+    }
 
     // Database creation sql statement
     private static final String DATABASE_CREATE1 = "create table AppAlarms(" +
@@ -45,7 +56,7 @@ public class DatabaseParent extends SQLiteOpenHelper {
             "status int not null);";
 
     public DatabaseParent(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     // Method is called during creation of the database

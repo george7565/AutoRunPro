@@ -1,5 +1,6 @@
 package com.george.autorunpro.adapter;
 
+import android.animation.ValueAnimator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -17,10 +18,13 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
@@ -52,12 +56,15 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
     private int lastPosition = -1;
     private RecyclerView recyclerView;
     private Context context;
+    SqlOperator sqlOperator;
+    AlarmSet am = new AlarmSet();
 
     public RecyclerviewAdapter(Context context,List<Pojo_fetch_data> datalist,RecyclerView recyclerView){
         inflator = LayoutInflater.from(context);
         this.datalist = datalist;
         this.recyclerView = recyclerView;
         this.context = context;
+        this.sqlOperator = new SqlOperator(context);
 
     }
     @Override
@@ -123,6 +130,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             holder.swt.setChecked(false);
         else
             holder.swt.setChecked(true);
+
         holder.deleteImageButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -130,28 +138,28 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
                 // Snackbar.make(v, "Alarm deleted",Snackbar.LENGTH_LONG).show();
                 // System.out.println("In onbindViewholder temp.id  = "+temp.id);
-                SqlOperator sqlOperator =new SqlOperator(v.getContext());
-                AlarmSet am = new AlarmSet();
+                String[] id = new String[2];
                 if(current_data.stop_time.equals("na")){
 
+                    id[0] = Integer.toString(current_data.id);
                     am.CancelAlarm(v.getContext(),current_data.id);
-                    sqlOperator.delete(current_data.id);
+                    sqlOperator.delete(id);
                     System.out.print("in na deleting id="+current_data.id);
                     //   height = 150;
                 }
                 else {
-                    System.out.println("deleting id=" +current_data.id + " and id + 1=" + current_data.id + 1);
+                    System.out.println("deleting id=" +current_data.id + " and id + 1=" + (current_data.id+1));
+                    id[0] = Integer.toString(current_data.id);
+                    id[1] = Integer.toString(current_data.id+1);
                     am.CancelAlarm(v.getContext(),current_data.id);
-                    sqlOperator.delete(current_data.id);
                     am.CancelAlarm(v.getContext(),current_data.id + 1);
-                    sqlOperator.delete((current_data.id + 1));
+                    sqlOperator.delete(id);
                     //  height = 200;
                 }
                 System.out.println("inside onclick = "+current_data.id);
                 //System.out.println("position = "+position);
                 //System.out.println(datalist.get(position).appname);
                 removeData(holder.getAdapterPosition(),datalist);
-                sqlOperator.close();
             }
         });
         holder.swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -165,10 +173,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                             Log.i("TAG","not-checked");
                             if(current_data.status == 1){
 
-                                SqlOperator sqlOperator = new SqlOperator(buttonView.getContext());
                                 ContentValues cv = new ContentValues();
                                 cv.put("status",0);
-                                AlarmSet am = new AlarmSet();
 
                                 sqlOperator.updateRecord(current_data.id,cv);
                                 am.CancelAlarm(buttonView.getContext(),current_data.id);
@@ -179,7 +185,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
                                 }
                                 datalist.get(position).status = 0;current_data.status = 0;
-                                sqlOperator.close();
                                 Snackbar.make(holder.itemView, "App Timer Off",
                                         Snackbar.LENGTH_LONG).show();
                             }
@@ -188,7 +193,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                         } else {
                             Log.i("TAG","checked");
                             if(current_data.status == 0){
-                                SqlOperator sqlOperator = new SqlOperator(buttonView.getContext());
                                 ContentValues cv = new ContentValues();
                                 cv.put("status",1);
                                 sqlOperator.updateRecord(current_data.id,cv);
@@ -201,7 +205,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
                                 //calender setup end
                                 Calendar calendar = getCalender(current_data.start_time);
-                                AlarmSet am = new AlarmSet();
                                 if (c != null)
                                     am.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id);
                                 else
@@ -217,7 +220,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                                         am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
                                 }
                                 datalist.get(position).status = 1;current_data.status = 1;
-                                sqlOperator.close();
                                 Snackbar.make(holder.itemView, "App Timer On",
                                         Snackbar.LENGTH_LONG).show();
                             }
@@ -230,15 +232,14 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 }
             }
         });
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+        /*holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Context context = v.getContext();
-                Intent intent = new Intent(context, EventAdder.class);
-                //context.startActivity(intent);
+                toggleCardViewnHeight(height);
             }
-        });
+        });*/
 
         holder.itemView.startAnimation(animation);
         lastPosition = position;
@@ -273,6 +274,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         ImageButton deleteImageButton;
         CardView cardview;
         SwitchCompat swt;
+        int minHeight;
 
         public myViewHolder(final View itemView) {
             super(itemView);
@@ -287,8 +289,86 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             swt =(SwitchCompat) itemView.findViewById(R.id.onoffbtn);
             deleteImageButton = (ImageButton) itemView.findViewById(R.id.delete_button);
 
+          //finding height of the screen
+            WindowManager windowmanager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+            DisplayMetrics dimension = new DisplayMetrics();
+            windowmanager.getDefaultDisplay().getMetrics(dimension);
+            final int height = dimension.heightPixels;
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    toggleCardViewnHeight(height);
+                }
+            });
+
+            cardview.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+
+                @Override
+                public boolean onPreDraw() {
+                    cardview.getViewTreeObserver().removeOnPreDrawListener(this);
+                    minHeight = cardview.getHeight();
+                    ViewGroup.LayoutParams layoutParams = cardview.getLayoutParams();
+                    layoutParams.height = minHeight;
+                    cardview.setLayoutParams(layoutParams);
+
+                    return true;
+                }
+            });
+
+
+        }
+        private void toggleCardViewnHeight(int height) {
+
+            if (cardview.getHeight() == minHeight) {
+                // expand
+
+                expandView(height); //'height' is the height of screen which we have measured already.
+
+            } else {
+                // collapse
+                collapseView();
+
+            }
+        }
+
+        public void collapseView() {
+
+            ValueAnimator anim = ValueAnimator.ofInt(cardview.getMeasuredHeightAndState(),
+                    minHeight);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    int val = (Integer) valueAnimator.getAnimatedValue();
+                    ViewGroup.LayoutParams layoutParams = cardview.getLayoutParams();
+                    layoutParams.height = val;
+                    cardview.setLayoutParams(layoutParams);
+
+                }
+            });
+            anim.start();
+        }
+
+        public void expandView(int height) {
+
+            ValueAnimator anim = ValueAnimator.ofInt(cardview.getMeasuredHeightAndState(),
+                    height);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    int val = (Integer) valueAnimator.getAnimatedValue();
+                    ViewGroup.LayoutParams layoutParams = cardview.getLayoutParams();
+                    layoutParams.height = val;
+                    cardview.setLayoutParams(layoutParams);
+                }
+            });
+            anim.start();
+
         }
     }
+
+
 
    private String time_in_12hr(String time){
 
@@ -323,5 +403,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
        return dp * context.getResources().getDisplayMetrics().density;
    }
+
+
 
 }//adapter end

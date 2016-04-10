@@ -1,5 +1,6 @@
 package com.george.autorunpro;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 import java.util.SortedMap;
@@ -13,11 +14,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -65,7 +69,6 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     }
 
                     c.close();
-                    sqlOperator.close();
                 } catch (Exception e) {
                     Log.i("Cursor exception: ", e.toString());
                 }
@@ -89,7 +92,6 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     }
 
                     c.close();
-                    sqlOperator.close();
                 } catch (Exception e) {
                     Log.i("Cursor exception: ", e.toString());
                 }
@@ -175,7 +177,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             notification_service.showNotification();
             context.startActivity(LaunchIntent);
         } else {
-            Notification_Service notification_service = new Notification_Service(context,"AutoRun Pro","Error!, cannot start "+getTitle(context,packageName)+"");
+            Notification_Service notification_service = new Notification_Service(context,"AutoRun Pro","Error, cannot start "+getTitle(context,packageName)+"");
             notification_service.showNotification();
         }
     }
@@ -193,6 +195,9 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
             String foregroundTaskPackageName = foregroundTaskInfo .topActivity.getPackageName();
 
+
+            //checking app is in foreground
+
                     if (foregroundTaskPackageName.equals(packageName)) {
                         Intent startMain = new Intent(Intent.ACTION_MAIN);
                         startMain.addCategory(Intent.CATEGORY_HOME);
@@ -201,32 +206,12 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                         Notification_Service notification_service = new Notification_Service(context, "AutoRun Pro", "Stopped " + getTitle(context, packageName) + " for you");
                         notification_service.showNotification();
                         am.killBackgroundProcesses(packageName);
-                        AudioManager manager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-
-                        // Request audio focus for playback
-                        int result = manager.requestAudioFocus(afChangeListener,
-                                // Use the music stream.
-                                AudioManager.STREAM_MUSIC,
-                                // Request permanent focus.
-                                AudioManager.AUDIOFOCUS_GAIN);
-
-                        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                            Log.i("inside stop","audio focus obtained");
-                            // Start playback.
-                        }
 
 
-            /*
-                        if(manager.isMusicActive())
-                        {
-                            // do something - or do it not
-                            //Intent i = new Intent("com.android.music.musicservicecommand");
-                            i.putExtra("command" , "stop" );
-                            context.getApplicationContext().sendBroadcast(i);
-                        }*/
-                    }
+                    } //foreground check close
 
-            }
+
+        }
 
         else
         {
@@ -258,10 +243,37 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         }
 
+        //Now checking if Stopped app is a media player,if it is then it must be playing audio,then stop media
+        //probable hack
+        AudioManager manager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        if(manager.isMusicActive())
+        {
+            Log.i("music active","on");
 
+            Intent resolve_intent = new Intent();
+            resolve_intent.setAction(android.content.Intent.ACTION_VIEW);
+            resolve_intent.setDataAndType(Uri.fromFile(new File("/some/path/to/a/file")), "audio/*");
+            List<ResolveInfo> playerList = context.getPackageManager().queryIntentActivities(resolve_intent, 0);
 
+            System.out.println("playerlist="+playerList.size());
+            for (ResolveInfo ri: playerList) {
+                Log.i("media players" , ri.activityInfo.packageName);
+                if((ri.activityInfo.packageName).equals(packageName)){
 
+                    // Request audio focus for playback
+                    int result = manager.requestAudioFocus(afChangeListener,
+                            // Use the music stream.
+                            AudioManager.STREAM_MUSIC,
+                            // Request permanent focus.
+                            AudioManager.AUDIOFOCUS_GAIN);
 
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                        Log.i("inside stop","audio focus obtained");
+                        // Start playback.
+                    }
+                }
+            }
+        }
 
     }
     void choose(Context context,int mode){

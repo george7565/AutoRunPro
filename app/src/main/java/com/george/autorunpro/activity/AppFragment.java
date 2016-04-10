@@ -8,13 +8,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,18 +20,13 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-
 import com.george.autorunpro.EventAdder;
-import com.george.autorunpro.MainActivity;
 import com.george.autorunpro.Pojo_fetch_data;
 import com.george.autorunpro.R;
 import com.george.autorunpro.SqlOperator;
 import com.george.autorunpro.adapter.RecyclerviewAdapter;
 import com.george.autorunpro.model.RecyclerScroll;
-import com.kogitune.activity_transition.ActivityTransitionLauncher;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -42,6 +35,7 @@ import java.util.List;
  * Use the {@link AppFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
 public class AppFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -98,11 +92,7 @@ public class AppFragment extends Fragment {
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(),EventAdder.class);
-                Bundle transitionBundle = ActivityTransitionLauncher.with(getActivity()).from(view).createBundle();
-                intent.putExtras(transitionBundle);
                 startActivityForResult(intent, 121);
-                // you should prevent default activity transition animation
-                getActivity().overridePendingTransition(0, 0);
             }
         });
 
@@ -173,7 +163,6 @@ public class AppFragment extends Fragment {
                 ));
             } while (c.moveToNext());
             c.close();
-            sqlOperator.close();
         }
 
         return datalist;
@@ -196,10 +185,11 @@ public class AppFragment extends Fragment {
                 if (alarmtype.equals("mono")) {
                     new_data = new Pojo_fetch_data(id, title, start_time, "na", status,week_status);
                 } else {
-                    //start time time is the 2nd row as order is desc
+                    //start time time is the 2nd row as order is desc and id is of 2nd row
                     c.moveToNext();
                     String stop_time = start_time;
                     start_time = c.getString(c.getColumnIndex("time"));//start time
+                    id = c.getInt(c.getColumnIndex("id"));
                     new_data = new Pojo_fetch_data(id, title, start_time, stop_time, status,week_status);
 
                 }
@@ -234,7 +224,7 @@ public class AppFragment extends Fragment {
             status += "Today ";
         }else if(status.equals("Runs: Sun Mon Tue Wed Thu Fri Sat "))
             status ="Runs: Weekdays";
-        status.replaceFirst("\\s+$", "");
+        status = status.replaceFirst("\\s+$", "");
         return status;
     }
 

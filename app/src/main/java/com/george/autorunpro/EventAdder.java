@@ -10,18 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-
 import com.george.autorunpro.activity.TimePickerFragment;
 import com.george.autorunpro.adapter.ApkAdapter;
-import com.kogitune.activity_transition.ActivityTransition;
-import com.kogitune.activity_transition.ExitActivityTransition;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,8 +53,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         sat = (CheckBox) findViewById(R.id.sat);
         sun = (CheckBox) findViewById(R.id.sun);
         sunb = 0; monb =0 ; tueb = 0 ; wedb=0 ; thub=0; frib=0; satb=0;
-
-        ActivityTransition.with(getIntent()).to(findViewById(R.id.event_adder)).duration(300).start(savedInstanceState);
 
 
         // having onclick listeners for showing timepicker dialogue fragment
@@ -99,13 +92,13 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                 if(fri.isChecked()) frib = 1; else frib = 0;
                 if(sat.isChecked()) satb = 1; else satb = 0;
 
-                if (start_time.getText().toString().length() == 0 ) {
+                if ( start_time.getText().toString().length() == 0 ) {
                     Snackbar.make(v, "Enter the Start time!",
                             Snackbar.LENGTH_LONG).show();
                 }
                 else {
 
-                    if(stop_time.getText().toString().length() == 0){
+                    if(stop_time.getText().toString().length() == 0 ){
 
                     DbAdd(packageInfo.packageName, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1);
                         System.out.println("in event adder id for only start=" + req_id);
@@ -140,8 +133,8 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         List<PackageInfo> packageList1 = new ArrayList<PackageInfo>();  //new list to add packages
         /*To filter out System apps*/
         for (PackageInfo pi : packageList) {
-            boolean b = isSystemPackage(pi);  //taking system apps too..
-            if (!b) {
+            if(packageManager.getLaunchIntentForPackage(pi.packageName) != null) {
+                // apps with launcher intent
                 packageList1.add(pi);
             }
         }
@@ -170,11 +163,11 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             }
         });
     }
-
-    private boolean isSystemPackage(PackageInfo pkgInfo) {
+/*
+    private boolean isNeededPackage(PackageInfo pkgInfo) {
         return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ? true : false;
 
-    }
+    }*/
 
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
@@ -231,7 +224,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         SqlOperator sqlOperator = new SqlOperator(getApplicationContext());
         sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
         req_id = sqlOperator.getNextid();
-        sqlOperator.close();
         return true;
     }
     public void return_to_fragment(){
