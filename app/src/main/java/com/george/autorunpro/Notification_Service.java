@@ -59,10 +59,11 @@ public class Notification_Service {
         /*sending notification to system. Here we use unique id (when)for making different each notification
          * if we use same id, then first notification replace by the last notification*/
                notificationManager.notify((int) when, notificationBuilder.build());
-           } catch (Exception e) {
+           }
+           catch (Exception e) {
                Log.e("Notification Exception", e.getMessage());
            }
 
-
    }
+
 }

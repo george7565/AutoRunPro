@@ -90,26 +90,35 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
                 if(fri.isChecked()) frib = 1; else frib = 0;
                 if(sat.isChecked()) satb = 1; else satb = 0;
 
-                if (start_time.getText().toString().length() == 0 ) {
-                    Snackbar.make(v, "Enter the Start time!",
+                if ( start_time.getText().toString().length() == 0 & stop_time.getText().toString().length() == 0) {
+                    Snackbar.make(v, "Enter the Start or Stop time!",
                             Snackbar.LENGTH_LONG).show();
                 }
                 else {
 
-                    if(stop_time.getText().toString().length() == 0){
+                    //setting alone type to start(0) or stop(1)
+                    if(start_time.getText().toString().length() == 0 || stop_time.getText().toString().length() == 0){
+                        String alonetime = start_timme;
+                        int alonetype = 0; //setting default to start
 
-                        DbAdd(item, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1);
-                        System.out.println("in event adder id for only start=" + req_id);
-                        Add_Alarm(start_timme);
+                        if(start_time.getText().toString().length() == 0){
+                            alonetype = 1;//alonetype is for stop
+                            alonetime = stop_timme;
+                        }
+
+
+                        DbAdd(item, alonetime, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1,alonetype);
+                        System.out.println("in event adder id for only start and stop=" + req_id);
+                        Add_Alarm(alonetime);
                         last_alarm = "mono";
                     }
 
                     else{
-
-                        DbAdd(item, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1);
+                        //setting alonetype to -1 being off
+                        DbAdd(item, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1,-1);
                         System.out.println("in event adder id for start in runkill=" + req_id);
                         Add_Alarm(start_timme);
-                        DbAdd(item, stop_timme, monb, tueb, wedb, thub, frib, satb, sunb, 1, 1);
+                        DbAdd(item, stop_timme, monb, tueb, wedb, thub, frib, satb, sunb, 1, 1,-1);
                         System.out.println("in event adder id for stop in run kill=" + req_id);
                         Add_Alarm(stop_timme);
                         last_alarm = "dual";
@@ -193,17 +202,16 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
             // Move to tomorrow
             calendar.add(Calendar.DATE, 1);
         }
-        AlarmSet as = new AlarmSet();
         if(monb == 1 || tueb == 1 || wedb == 1 || thub == 1 || frib==1 || satb==1 || sunb==1)
-            as.SetRepeatAlarm(getApplicationContext(),calendar,req_id);
+            AlarmSet.SetRepeatAlarm(getApplicationContext(),calendar,req_id);
         else
-            as.setOnetimeTimer(getApplicationContext(),calendar,req_id);
+            AlarmSet.setOnetimeTimer(getApplicationContext(),calendar,req_id);
         return true;
     }
-    private boolean DbAdd(String name,String time,int mon,int tue,int wed,int thur,int fri,int sat,int sund,int mode,int status){
+    private boolean DbAdd(String name,String time,int mon,int tue,int wed,int thur,int fri,int sat,int sund,int mode,int status,int alonetype){
 
         SqlOperator2 sqlOperator = new SqlOperator2(getApplicationContext());
-        sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status);
+        sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status,alonetype);
         req_id = sqlOperator.getNextid();
         return true;
     }

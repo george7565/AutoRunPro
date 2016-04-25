@@ -1,7 +1,9 @@
 package com.george.autorunpro;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
@@ -29,12 +32,21 @@ public class MainActivity extends AppCompatActivity{
 
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
+    private SharedPreferences prefs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Start the thread
+        t.start();
         setContentView(R.layout.activity_main);
 
+
+        //setting default preference
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -60,23 +72,39 @@ public class MainActivity extends AppCompatActivity{
         }
 
 // Set behavior of Navigation drawer
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    // This method will trigger on item Click of navigation menu
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // Set item in checked state
-                        menuItem.setChecked(true);
-                         int id = menuItem.getItemId();
-                        if (id == R.id.one) {
+        try {
+            navigationView.setNavigationItemSelectedListener(
+                    new NavigationView.OnNavigationItemSelectedListener() {
+                        // This method will trigger on item Click of navigation menu
+                        @Override
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
+                            // Set item in checked state
+                            menuItem.setChecked(false);
+                            int id = menuItem.getItemId();
+                            if (id == R.id.Settings) {
+                                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                                startActivity(intent);
+                            }else if(id ==  R.id.Help ){
+                                Intent i = new Intent(MainActivity.this, IntroActivity.class);
+                                startActivity(i);
 
+                            }else{
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setIcon(R.drawable.launcher)
+                                        .setTitle(getString(R.string.app_name) +" "+BuildConfig.VERSION_NAME)
+                                        .setMessage(getString(R.string.aboutapp))
+                                        .setPositiveButton("Ok", null);
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+
+                            // Closing drawer on item click
+                            mDrawerLayout.closeDrawers();
+                            return true;
                         }
+                    });
+        }catch (NullPointerException e){e.printStackTrace();}
 
-                        // Closing drawer on item click
-                        mDrawerLayout.closeDrawers();
-                        return true;
-                    }
-                });
     }
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
@@ -84,7 +112,7 @@ public class MainActivity extends AppCompatActivity{
         adapter.addFragment(new AppFragment(), "Applications");
         adapter.addFragment(new FunctionFragment(), "Functions");
         viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(Integer.parseInt(prefs.getString("tabvalue", "0")));
     }
 
     static class Adapter extends FragmentPagerAdapter {
@@ -132,7 +160,7 @@ public class MainActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }else if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
@@ -140,6 +168,36 @@ public class MainActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
+
+    Thread t = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            //  Initialize SharedPreferences
+            SharedPreferences getPrefs = PreferenceManager
+                    .getDefaultSharedPreferences(getBaseContext());
+
+            //  Create a new boolean and preference and set it to true
+            boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
+
+            //  If the activity has never started before...
+            if (isFirstStart) {
+
+                //  Launch app intro
+                Intent i = new Intent(MainActivity.this, IntroActivity.class);
+                startActivity(i);
+
+                //  Make a new preferences editor
+                SharedPreferences.Editor e = getPrefs.edit();
+
+                //  Edit preference to make it false because we don't want this to run again
+                e.putBoolean("firstStart", false);
+
+                //  Apply changes
+                e.apply();
+            }
+        }
+    });
+
 
 
  }

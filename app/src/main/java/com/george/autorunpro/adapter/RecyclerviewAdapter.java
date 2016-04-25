@@ -57,7 +57,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
     private RecyclerView recyclerView;
     private Context context;
     SqlOperator sqlOperator;
-    AlarmSet am = new AlarmSet();
 
     public RecyclerviewAdapter(Context context,List<Pojo_fetch_data> datalist,RecyclerView recyclerView){
         inflator = LayoutInflater.from(context);
@@ -110,19 +109,26 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
 
         //setting appname and icon end
-
+        holder.start.setText("START TIME");
         holder.stop_time.setVisibility(View.VISIBLE);
         holder.stop.setVisibility(View.VISIBLE);
         holder.stop_padding.setVisibility(View.VISIBLE);
         holder.start_time.setText(time_in_12hr(current_data.start_time));
+
         if (! current_data.stop_time.equals("na") )
             holder.stop_time.setText(time_in_12hr(current_data.stop_time));
-        else{
+        else{  //event is alone ,so checking event is start or stop
+            Cursor c = sqlOperator.selectRecord("select alonetype from AppAlarms where id="+current_data.id);
+            c.moveToFirst();
+            int alonetype = c.getInt(c.getColumnIndex("alonetype"));
+            c.close();
+            if(alonetype == 1)
+                holder.start.setText("STOP TIME");
             holder.stop_time.setVisibility(View.GONE);
             holder.stop.setVisibility(View.GONE);
             holder.stop_padding.setVisibility(View.GONE);
-
             holder.cardview.getLayoutParams().height = (int)dp_to_px(160);
+
         }
         holder.weekdays.setText(current_data.weekday_status);
 
@@ -142,7 +148,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 if(current_data.stop_time.equals("na")){
 
                     id[0] = Integer.toString(current_data.id);
-                    am.CancelAlarm(v.getContext(),current_data.id);
+                    AlarmSet.CancelAlarm(v.getContext(),current_data.id);
                     sqlOperator.delete(id);
                     System.out.print("in na deleting id="+current_data.id);
                     //   height = 150;
@@ -151,8 +157,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                     System.out.println("deleting id=" +current_data.id + " and id + 1=" + (current_data.id+1));
                     id[0] = Integer.toString(current_data.id);
                     id[1] = Integer.toString(current_data.id+1);
-                    am.CancelAlarm(v.getContext(),current_data.id);
-                    am.CancelAlarm(v.getContext(),current_data.id + 1);
+                    AlarmSet.CancelAlarm(v.getContext(),current_data.id);
+                    AlarmSet.CancelAlarm(v.getContext(),current_data.id + 1);
                     sqlOperator.delete(id);
                     //  height = 200;
                 }
@@ -177,11 +183,11 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                                 cv.put("status",0);
 
                                 sqlOperator.updateRecord(current_data.id,cv);
-                                am.CancelAlarm(buttonView.getContext(),current_data.id);
+                                AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id);
                                 if(!current_data.stop_time.equals("na")){
 
                                     sqlOperator.updateRecord(current_data.id + 1,cv);
-                                    am.CancelAlarm(buttonView.getContext(),current_data.id + 1);
+                                    AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id + 1);
 
                                 }
                                 datalist.get(position).status = 0;current_data.status = 0;
@@ -206,18 +212,18 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                                 //calender setup end
                                 Calendar calendar = getCalender(current_data.start_time);
                                 if (c != null)
-                                    am.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id);
+                                    AlarmSet.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id);
                                 else
-                                    am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id);
-                                am.CancelAlarm(buttonView.getContext(),current_data.id);
+                                    AlarmSet.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id);
+                                AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id);
                                 if(!current_data.stop_time.equals("na")){
 
                                     sqlOperator.updateRecord(current_data.id + 1,cv);
                                     calendar = getCalender(current_data.stop_time);
                                     if(c != null)
-                                        am.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id + 1);
+                                        AlarmSet.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id + 1);
                                     else
-                                        am.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
+                                        AlarmSet.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
                                 }
                                 datalist.get(position).status = 1;current_data.status = 1;
                                 Snackbar.make(holder.itemView, "App Timer On",
@@ -269,8 +275,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
     class myViewHolder extends RecyclerView.ViewHolder{
 
-        TextView appname,start_time,stop_time,stop,stop_padding,weekdays;
-        ImageView img;
+        TextView appname,start_time,stop_time,stop,stop_padding,weekdays,start;
         ImageButton deleteImageButton;
         CardView cardview;
         SwitchCompat swt;
@@ -283,6 +288,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             start_time = (TextView) itemView.findViewById(R.id.start_time);
             stop_time = (TextView) itemView.findViewById(R.id.stop_time);
             stop = (TextView) itemView.findViewById(R.id.stop);
+            start = (TextView) itemView.findViewById(R.id.start);
             stop_padding = (TextView) itemView.findViewById(R.id.padding1);
             weekdays = (TextView) itemView.findViewById(R.id.weekday);
             cardview =  (CardView) itemView.findViewById(R.id.card_view);

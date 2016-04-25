@@ -10,11 +10,11 @@ import java.util.Calendar;
 /**
  * Created by Akshay on 23-Feb-16.
  */
-public class AlarmSet {
+public  class AlarmSet {
 
     //final public static String ONE_TIME = "onetime";
 
-    public void SetRepeatAlarm(Context context, Calendar calendar,int req_id)
+    public static  void SetRepeatAlarm(Context context, Calendar calendar,int req_id)
     {
 
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
@@ -22,11 +22,10 @@ public class AlarmSet {
         intent.putExtra("id" , req_id);
         intent.putExtra("type","repeating");
         PendingIntent pi = PendingIntent.getBroadcast(context, req_id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //After after 5 seconds
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 24*60*60*1000, pi);
     }
 
-    public void CancelAlarm(Context context,int req_id)
+    public static  void CancelAlarm(Context context,int req_id)
     {
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         intent.putExtra("id" ,req_id);
@@ -35,7 +34,7 @@ public class AlarmSet {
         alarmManager.cancel(sender);
     }
 
-    public void setOnetimeTimer(Context context,Calendar calendar,int req_id){
+    public static void setOnetimeTimer(Context context,Calendar calendar,int req_id){
         System.out.println("in alarm set fn id= "+ req_id);
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);

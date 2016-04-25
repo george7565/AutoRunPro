@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -21,9 +22,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
@@ -33,9 +36,24 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     int id;
     String packageName,type,funcname;
     boolean is_a_function;
+    private SharedPreferences prefs;
+    boolean checkIfEnabled = true;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        Toast.makeText(context, "reciever inside"     , Toast.LENGTH_LONG).show();
+        //scheduling alarms after reboot by service
+        String action = intent.getAction();
+        Toast.makeText(context, "intent is "+action     , Toast.LENGTH_LONG).show();
+        if ("android.intent.action.BOOT_COMPLETED".equals(action) || "android.intent.action.MY_PACKAGE_REPLACED".equals(action) )
+        {
+            Intent i = new Intent(context, AlarmSchedulerService.class);
+            context.startService(i);
+        }
+
+        //
+
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
         //Acquire the lock
@@ -47,11 +65,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             id = extras.getInt(REQ_ID);
             type = extras.getString("type");
         }
-
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        checkIfEnabled = prefs.getBoolean("notificationToggle",true);
         System.out.println("Inside reciever id="+id);
             if(id < 500) {
 
                 try {
+
                     is_a_function = false;
                     String query = "select * from 'AppAlarms' where id =" + id;
                     SqlOperator sqlOperator = new SqlOperator(context);
@@ -60,7 +80,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     System.out.println(c.getString(c.getColumnIndex("appname")));
                     System.out.println(c.getString(c.getColumnIndex("time")));
                     packageName = c.getString(c.getColumnIndex("appname"));
-                    int mode = c.getInt(c.getColumnIndex("mode"));
+                    int alonetype = c.getInt(c.getColumnIndex("alonetype"));
+                    int mode;
+                    if (alonetype != -1)
+                        mode = alonetype;
+                    else
+                        mode= c.getInt(c.getColumnIndex("mode"));
+
                     Boolean issinglealarm = alarmtype_selector(context, mode);
                     if(issinglealarm){
                         ContentValues cv = new ContentValues();
@@ -83,7 +109,13 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                     System.out.println(c.getString(c.getColumnIndex("funcname")));
                     System.out.println(c.getString(c.getColumnIndex("time")));
                     funcname = c.getString(c.getColumnIndex("funcname"));
-                    int mode = c.getInt(c.getColumnIndex("mode"));
+                    int alonetype = c.getInt(c.getColumnIndex("alonetype"));
+                    int mode;
+                    if (alonetype != -1)
+                        mode = alonetype;
+                    else
+                        mode= c.getInt(c.getColumnIndex("mode"));
+
                     Boolean issinglealarm = alarmtype_selector(context, mode);
                     if(issinglealarm){
                         ContentValues cv = new ContentValues();
@@ -101,6 +133,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         wl.release();
 
     }
+
      private boolean alarmtype_selector(Context context,int mode){
 
         if (type.equals("repeating")) {
@@ -173,12 +206,10 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         PackageManager packm = context.getPackageManager();
         Intent LaunchIntent = packm.getLaunchIntentForPackage(packageName);
         if (LaunchIntent != null) {
-            Notification_Service notification_service = new Notification_Service(context,"AutoRun Pro","Started "+getTitle(context,packageName)+" for you");
-            notification_service.showNotification();
             context.startActivity(LaunchIntent);
+            showNotificationOnEnable(context,"Started "+getTitle(context,packageName)+" for you",checkIfEnabled);
         } else {
-            Notification_Service notification_service = new Notification_Service(context,"AutoRun Pro","Error, cannot start "+getTitle(context,packageName)+"");
-            notification_service.showNotification();
+            showNotificationOnEnable(context,"Error, cannot start "+getTitle(context,packageName)+"",checkIfEnabled);
         }
     }
 
@@ -203,10 +234,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                         startMain.addCategory(Intent.CATEGORY_HOME);
                         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(startMain);
-                        Notification_Service notification_service = new Notification_Service(context, "AutoRun Pro", "Stopped " + getTitle(context, packageName) + " for you");
-                        notification_service.showNotification();
-                        am.killBackgroundProcesses(packageName);
-
+                        showNotificationOnEnable(context,"Stopped "+getTitle(context,packageName)+" for you",checkIfEnabled);
 
                     } //foreground check close
 
@@ -235,8 +263,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                         startMain.addCategory(Intent.CATEGORY_HOME);
                         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(startMain);
-                        Notification_Service notification_service = new Notification_Service(context, "AutoRun Pro", "Stopped " + getTitle(context, packageName) + " for you");
-                        notification_service.showNotification();
+                        showNotificationOnEnable(context,"Stopped "+getTitle(context,packageName)+" for you",checkIfEnabled);
                     }
                 }
             }
@@ -331,9 +358,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                      status = "Error in enabling/disabling";
                  }
              }
-
-            Notification_Service notification_service = new Notification_Service(context,"AutoRun Pro",status+" "+funcname+ " for you");
-            notification_service.showNotification();
+            showNotificationOnEnable(context,status+" "+funcname+ " for you",checkIfEnabled);
         }
 
     }
@@ -367,5 +392,11 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                 }
             };
 
+    void showNotificationOnEnable(Context context,String msg,boolean isEnabled){
 
+        if(isEnabled){
+            Notification_Service notification_service = new Notification_Service(context,"AutoRun Pro",msg);
+            notification_service.showNotification();
+        }
+    }
 }

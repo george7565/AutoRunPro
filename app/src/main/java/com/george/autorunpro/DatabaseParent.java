@@ -38,7 +38,8 @@ public class DatabaseParent extends SQLiteOpenHelper {
             "saturday int not null," +
             "sunday int not null," +
             "mode int not null," +
-            "status int not null);";
+            "status int not null,"+
+             "alonetype int not null);";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE2 = "create table FuncAlarms(" +
@@ -53,7 +54,8 @@ public class DatabaseParent extends SQLiteOpenHelper {
             "saturday int not null," +
             "sunday int not null," +
             "mode int not null," +
-            "status int not null);";
+            "status int not null,"+
+            "alonetype int not null);";
 
     public DatabaseParent(Context context) {
         super(context.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);

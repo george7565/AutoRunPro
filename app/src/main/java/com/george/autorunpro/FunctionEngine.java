@@ -13,8 +13,8 @@ import android.net.wifi.WifiManager;
  */
 public class FunctionEngine {
 
-    private int ON =0;
-    private int OFF = 1;
+    private static final int ON =0;
+    private static final int OFF = 1;
     private Context context;
 
 

@@ -1,0 +1,13 @@
+<resources>
+
+    <string-array name="tabs">
+        <item>Applications</item>
+        <item>Functions</item>
+    </string-array>
+
+    <string-array name="tabValues">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+</resources>
