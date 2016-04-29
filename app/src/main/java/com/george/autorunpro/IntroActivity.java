@@ -3,7 +3,6 @@ package com.george.autorunpro;
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
-
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 
@@ -19,15 +18,13 @@ public class IntroActivity extends AppIntro {
 
         // Add your slide's fragments here.
         // AppIntro will automatically generate the dots indicator and buttons.
-       String title ="dsfsdfsdf";
-        String description = "saaaaaaaaaaaa";
-        Image image = null;
 
         // Instead of fragments, you can also use our default slide
         // Just set a title, description, background and image. AppIntro will do the rest.
-        addSlide(AppIntroFragment.newInstance(title, description, R.drawable.launcher, Color.parseColor("#00bcd4")));
-        addSlide(AppIntroFragment.newInstance(title, description, R.drawable.launcher, Color.parseColor("#4caf50")));
-        addSlide(AppIntroFragment.newInstance(title, description, R.drawable.launcher, Color.parseColor("#5c6bc0")));
+        addSlide(AppIntroFragment.newInstance("Hi, Welcome to AutoRun Pro", "I will help you to automate functions of your phone", R.drawable.launcher, Color.parseColor("#0ba9f3")));
+        addSlide(AppIntroFragment.newInstance("Autorun your Apps", "You can launch your apps at any time you want", R.drawable.launcher,Color.parseColor("#f12821")));
+        addSlide(AppIntroFragment.newInstance("Toggle your phone functions", "You can toggle supported functions like wifi at your prefered time", R.drawable.launcher, Color.parseColor("#4d6a78")));
+        addSlide(AppIntroFragment.newInstance("You are all set,Enjoy AutoRun Pro", "Get Started", R.drawable.intro4,  Color.parseColor("#4caf50")));
         // OPTIONAL METHODS
         // Override bar/separator color.
         setBarColor(Color.parseColor("#00FFFFFF"));

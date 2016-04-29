@@ -19,11 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-
-import com.george.autorunpro.activity.AppFragment;
-import com.george.autorunpro.activity.FunctionFragment;
-
+import com.george.autorunpro.fragment.AppFragment;
+import com.george.autorunpro.fragment.FunctionFragment;
 import java.util.ArrayList;
 import java.util.List;
 

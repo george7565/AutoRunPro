@@ -13,7 +13,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import com.george.autorunpro.activity.TimePickerFragment;
+import com.george.autorunpro.fragment.TimePickerFragment;
 import com.george.autorunpro.adapter.FunctionAdapter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

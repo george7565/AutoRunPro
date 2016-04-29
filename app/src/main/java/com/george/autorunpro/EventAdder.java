@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import com.george.autorunpro.activity.TimePickerFragment;
+import com.george.autorunpro.fragment.TimePickerFragment;
 import com.george.autorunpro.adapter.ApkAdapter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
