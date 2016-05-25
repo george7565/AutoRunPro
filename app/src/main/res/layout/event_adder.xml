@@ -46,7 +46,6 @@
         android:id="@+id/text_layout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="20sp"
         android:layout_below="@+id/text_layout1">
     <EditText
         android:id="@+id/stoptime"
@@ -57,11 +56,18 @@
         android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
 
+   <TextView
+       android:id="@+id/stoppadding"
+       android:layout_below="@id/text_layout2"
+       android:layout_width="match_parent"
+       android:text=""
+       android:layout_height="20sp" />
+
 <TextView
     android:id="@+id/days_label"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/text_layout2"
+    android:layout_below="@+id/stoppadding"
     android:layout_marginBottom="20sp"
     android:textSize="20sp"
     android:text="Repeat on "/>

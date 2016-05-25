@@ -138,6 +138,7 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
         functionList.add("Vibrate Mode");
         functionList.add("Bluetooth");
         functionList.add("Silent Mode");
+        functionList.add("Stop Audio");
         //spinner
         Spinner funcList = (Spinner) findViewById(R.id.dynamic_spinner);
         funcList.setAdapter(new FunctionAdapter(FunctionAdder.this, functionList));
@@ -148,7 +149,10 @@ public class FunctionAdder extends AppCompatActivity implements TimePickerFragme
                                        int position, long id) {
                 item =  (String) parent.getItemAtPosition(position);
                 Log.i("Member name: ", item);
-
+                if(item.equals("Stop Audio")){
+                    stop_time.setEnabled(false);
+                }else
+                    stop_time.setEnabled(true);
             }
 
             @Override

@@ -4,14 +4,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
 public class AlarmSchedulerService extends Service {
 
-    private Cursor c = null;
     private int sunb,monb,tueb,wedb,thub,frib,satb,req_id;
     String time = null;
 
@@ -62,7 +60,7 @@ public class AlarmSchedulerService extends Service {
     private void getAndSetAlarms(String query){
 
         SqlOperator sqlOperator = new SqlOperator(this);
-        c = sqlOperator.selectRecord(query);
+        Cursor c = sqlOperator.selectRecord(query);
         if (c.moveToFirst()) {
             do {
                 sunb = c.getInt(c.getColumnIndex("sunday"));

@@ -118,10 +118,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
         }
         holder.weekdays.setText(current_data.weekday_status);
 
-        if(current_data.status == 0)
-            holder.swt.setChecked(false);
-        else
-            holder.swt.setChecked(true);
+
         holder.deleteImageButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -187,7 +184,7 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
                                 ContentValues cv = new ContentValues();
                                 cv.put("status",1);
                                 sqlOperator.updateRecord(current_data.id,cv);
-                                String query = "select * from AppAlarms where " +
+                                String query = "select * from FuncAlarms where " +
                                         "(monday = 1 OR tuesday = 1 OR wednesday = 1 OR " +
                                         "thursday = 1 OR friday = 1 OR saturday = 1 OR sunday = 1) " +
                                         "AND id ="+current_data.id;
@@ -196,16 +193,16 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
 
                                 //calender setup end
                                 Calendar calendar = getCalender(current_data.start_time);
-                                if (c != null)
+                                if (c.getCount() != 0)
                                     AlarmSet.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id);
                                 else
                                     AlarmSet.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id);
-                                AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id);
+
                                 if(!current_data.stop_time.equals("na")){
 
                                     sqlOperator.updateRecord(current_data.id + 1,cv);
                                     calendar = getCalender(current_data.stop_time);
-                                    if(c != null)
+                                    if(c.getCount() != 0)
                                         AlarmSet.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id + 1);
                                     else
                                         AlarmSet.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
@@ -231,6 +228,10 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
             }
         });
 
+        if(current_data.status == 0)
+            holder.swt.setChecked(false);
+        else
+            holder.swt.setChecked(true);
         holder.itemView.startAnimation(animation);
         lastPosition = position;
     }
@@ -329,6 +330,8 @@ public class RecyclerviewAdapter2 extends RecyclerView.Adapter <RecyclerviewAdap
             name = "func3";
         else if(funcname.equals("Silent Mode"))
             name = "func4";
+        else if(funcname.equals("Stop Audio"))
+            name = "func5";
         return name;
     }
 }//adapter end

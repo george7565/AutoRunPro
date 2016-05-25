@@ -107,44 +107,24 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                 holder.cardview.getLayoutParams().height = (int)dp_to_px(200);
                 holder.appname.setText(title);
 
-
         //setting appname and icon end
-        holder.start.setText("START TIME");
-        holder.stop_time.setVisibility(View.VISIBLE);
-        holder.stop.setVisibility(View.VISIBLE);
-        holder.stop_padding.setVisibility(View.VISIBLE);
+        holder.stop_time.setVisibility(View.GONE);
+        holder.stop.setVisibility(View.GONE);
+        holder.stop_padding.setVisibility(View.GONE);
+        holder.cardview.getLayoutParams().height = (int)dp_to_px(160);
+
         holder.start_time.setText(time_in_12hr(current_data.start_time));
 
-        if (! current_data.stop_time.equals("na") )
-            holder.stop_time.setText(time_in_12hr(current_data.stop_time));
-        else{  //event is alone ,so checking event is start or stop
-            Cursor c = sqlOperator.selectRecord("select alonetype from AppAlarms where id="+current_data.id);
-            c.moveToFirst();
-            int alonetype = c.getInt(c.getColumnIndex("alonetype"));
-            c.close();
-            if(alonetype == 1)
-                holder.start.setText("STOP TIME");
-            holder.stop_time.setVisibility(View.GONE);
-            holder.stop.setVisibility(View.GONE);
-            holder.stop_padding.setVisibility(View.GONE);
-            holder.cardview.getLayoutParams().height = (int)dp_to_px(160);
-
-        }
         holder.weekdays.setText(current_data.weekday_status);
 
-        if(current_data.status == 0)
-            holder.swt.setChecked(false);
-        else
-            holder.swt.setChecked(true);
+
 
         holder.deleteImageButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
 
-                // Snackbar.make(v, "Alarm deleted",Snackbar.LENGTH_LONG).show();
-                // System.out.println("In onbindViewholder temp.id  = "+temp.id);
-                String[] id = new String[2];
+                String[] id = new String[1];
                 if(current_data.stop_time.equals("na")){
 
                     id[0] = Integer.toString(current_data.id);
@@ -153,21 +133,10 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                     System.out.print("in na deleting id="+current_data.id);
                     //   height = 150;
                 }
-                else {
-                    System.out.println("deleting id=" +current_data.id + " and id + 1=" + (current_data.id+1));
-                    id[0] = Integer.toString(current_data.id);
-                    id[1] = Integer.toString(current_data.id+1);
-                    AlarmSet.CancelAlarm(v.getContext(),current_data.id);
-                    AlarmSet.CancelAlarm(v.getContext(),current_data.id + 1);
-                    sqlOperator.delete(id);
-                    //  height = 200;
-                }
-                System.out.println("inside onclick = "+current_data.id);
-                //System.out.println("position = "+position);
-                //System.out.println(datalist.get(position).appname);
                 removeData(holder.getAdapterPosition(),datalist);
             }
         });
+
         holder.swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -184,13 +153,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
 
                                 sqlOperator.updateRecord(current_data.id,cv);
                                 AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id);
-                                if(!current_data.stop_time.equals("na")){
-
-                                    sqlOperator.updateRecord(current_data.id + 1,cv);
-                                    AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id + 1);
-
-                                }
-                                datalist.get(position).status = 0;current_data.status = 0;
+                                datalist.get(position).status = 0;
+                                current_data.status = 0;
                                 Snackbar.make(holder.itemView, "App Timer Off",
                                         Snackbar.LENGTH_LONG).show();
                             }
@@ -200,32 +164,25 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
                             Log.i("TAG","checked");
                             if(current_data.status == 0){
                                 ContentValues cv = new ContentValues();
-                                cv.put("status",1);
-                                sqlOperator.updateRecord(current_data.id,cv);
+
                                 String query = "select * from AppAlarms where " +
                                         "(monday = 1 OR tuesday = 1 OR wednesday = 1 OR " +
                                         "thursday = 1 OR friday = 1 OR saturday = 1 OR sunday = 1) " +
                                         "AND id ="+current_data.id;
                                 Cursor c = sqlOperator.selectRecord(query);
-                                // setting app start time calender
 
-                                //calender setup end
                                 Calendar calendar = getCalender(current_data.start_time);
-                                if (c != null)
+
+                                if (c.getCount() != 0)
                                     AlarmSet.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id);
                                 else
                                     AlarmSet.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id);
-                                AlarmSet.CancelAlarm(buttonView.getContext(),current_data.id);
-                                if(!current_data.stop_time.equals("na")){
 
-                                    sqlOperator.updateRecord(current_data.id + 1,cv);
-                                    calendar = getCalender(current_data.stop_time);
-                                    if(c != null)
-                                        AlarmSet.SetRepeatAlarm(buttonView.getContext(),calendar,current_data.id + 1);
-                                    else
-                                        AlarmSet.setOnetimeTimer(buttonView.getContext(),calendar,current_data.id + 1);
-                                }
-                                datalist.get(position).status = 1;current_data.status = 1;
+                                cv.put("status",1);
+                                sqlOperator.updateRecord(current_data.id,cv);
+
+                                datalist.get(position).status = 1;
+                                current_data.status = 1;
                                 Snackbar.make(holder.itemView, "App Timer On",
                                         Snackbar.LENGTH_LONG).show();
                             }
@@ -239,14 +196,10 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             }
         });
 
-        /*holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                toggleCardViewnHeight(height);
-            }
-        });*/
-
+        if(current_data.status == 0)
+            holder.swt.setChecked(false);
+        else
+            holder.swt.setChecked(true);
         holder.itemView.startAnimation(animation);
         lastPosition = position;
     }
@@ -273,13 +226,12 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
         return this.datalist.size();
     }
 
-    class myViewHolder extends RecyclerView.ViewHolder{
+    class myViewHolder extends RecyclerView.ViewHolder {
 
-        TextView appname,start_time,stop_time,stop,stop_padding,weekdays,start;
+        TextView appname, start_time, stop_time, stop, stop_padding, weekdays, start;
         ImageButton deleteImageButton;
         CardView cardview;
         SwitchCompat swt;
-        int minHeight;
 
         public myViewHolder(final View itemView) {
             super(itemView);
@@ -291,85 +243,10 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter <RecyclerviewAdapt
             start = (TextView) itemView.findViewById(R.id.start);
             stop_padding = (TextView) itemView.findViewById(R.id.padding1);
             weekdays = (TextView) itemView.findViewById(R.id.weekday);
-            cardview =  (CardView) itemView.findViewById(R.id.card_view);
-            swt =(SwitchCompat) itemView.findViewById(R.id.onoffbtn);
+            cardview = (CardView) itemView.findViewById(R.id.card_view);
+            swt = (SwitchCompat) itemView.findViewById(R.id.onoffbtn);
             deleteImageButton = (ImageButton) itemView.findViewById(R.id.delete_button);
 
-          //finding height of the screen
-            WindowManager windowmanager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-            DisplayMetrics dimension = new DisplayMetrics();
-            windowmanager.getDefaultDisplay().getMetrics(dimension);
-            final int height = dimension.heightPixels;
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    toggleCardViewnHeight(height);
-                }
-            });
-
-            cardview.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-
-                @Override
-                public boolean onPreDraw() {
-                    cardview.getViewTreeObserver().removeOnPreDrawListener(this);
-                    minHeight = cardview.getHeight();
-                    ViewGroup.LayoutParams layoutParams = cardview.getLayoutParams();
-                    layoutParams.height = minHeight;
-                    cardview.setLayoutParams(layoutParams);
-
-                    return true;
-                }
-            });
-
-
-        }
-        private void toggleCardViewnHeight(int height) {
-
-            if (cardview.getHeight() == minHeight) {
-                // expand
-
-                expandView(height); //'height' is the height of screen which we have measured already.
-
-            } else {
-                // collapse
-                collapseView();
-
-            }
-        }
-
-        public void collapseView() {
-
-            ValueAnimator anim = ValueAnimator.ofInt(cardview.getMeasuredHeightAndState(),
-                    minHeight);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    ViewGroup.LayoutParams layoutParams = cardview.getLayoutParams();
-                    layoutParams.height = val;
-                    cardview.setLayoutParams(layoutParams);
-
-                }
-            });
-            anim.start();
-        }
-
-        public void expandView(int height) {
-
-            ValueAnimator anim = ValueAnimator.ofInt(cardview.getMeasuredHeightAndState(),
-                    height);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    ViewGroup.LayoutParams layoutParams = cardview.getLayoutParams();
-                    layoutParams.height = val;
-                    cardview.setLayoutParams(layoutParams);
-                }
-            });
-            anim.start();
 
         }
     }

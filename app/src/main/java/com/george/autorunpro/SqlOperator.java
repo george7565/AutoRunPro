@@ -24,10 +24,8 @@ public class SqlOperator{
     public final static String FRIDAY = "friday";
     public final static String SATURDAY = "saturday";
     public final static String SUNDAY = "sunday";
-    public final static String MODE = "mode";
     public final static String STATUS = "status";
     public final static String ID = "id";
-    public final static String ALONETYPE = "alonetype";
 
     /**
      *
@@ -40,7 +38,7 @@ public class SqlOperator{
     }
 
 
-    public long createRecords(String appname, String time,int mon,int tue,int wed,int thur,int fri,int sat,int sun,int mode,int status,int alonetype){
+    public long createRecords(String appname, String time,int mon,int tue,int wed,int thur,int fri,int sat,int sun,int status){
         ContentValues values = new ContentValues();
         values.put(APP_NAME, appname);
         values.put(APP_TIME, time);
@@ -51,9 +49,7 @@ public class SqlOperator{
         values.put(FRIDAY,fri);
         values.put(SATURDAY,sat);
         values.put(SUNDAY,sun);
-        values.put(MODE,mode);
         values.put(STATUS,status);
-        values.put(ALONETYPE,alonetype);
         return database.insert(APP_TABLE, null, values);
     }
 

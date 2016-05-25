@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+
 import com.george.autorunpro.fragment.TimePickerFragment;
 import com.george.autorunpro.adapter.ApkAdapter;
 import java.text.ParseException;
@@ -29,13 +31,13 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
 
     PackageManager packageManager;
     EditText start_time,stop_time;
+    TextView stoppadding;
     Button btn;
-    String time_temp = "00:00",start_timme,stop_timme;
+    String time_temp = "00:00",start_timme;
     PackageInfo packageInfo;
     int req_id;
     CheckBox sun,mon,tue,wed,thu,fri,sat;
     int sunb,monb,tueb,wedb,thub,frib,satb;
-    String last_alarm = null;
     int resultcode = 100;
 
     @Override
@@ -44,6 +46,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
         setContentView(R.layout.event_adder);
         start_time = (EditText) findViewById(R.id.starttime);
         stop_time = (EditText) findViewById(R.id.stoptime);
+        stoppadding = (TextView) findViewById(R.id.stoppadding);
         btn =(Button) findViewById(R.id.btn);
         mon = (CheckBox) findViewById(R.id.mon);
         tue = (CheckBox) findViewById(R.id.tue);
@@ -56,6 +59,8 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
 
 
         // having onclick listeners for showing timepicker dialogue fragment
+        stop_time.setVisibility(View.GONE);
+        stoppadding.setVisibility(View.GONE);
        start_time.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -67,17 +72,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
 
             }
        });
-        stop_time.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                DialogFragment newFragment = new TimePickerFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("key","stop" );
-                newFragment.setArguments(bundle);
-                newFragment.show(getFragmentManager(), "timePicker");
-            }
-        });
-
 
       //events happenning on button click
         btn.setOnClickListener(new View.OnClickListener() {
@@ -92,42 +86,17 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                 if(fri.isChecked()) frib = 1; else frib = 0;
                 if(sat.isChecked()) satb = 1; else satb = 0;
 
-                if ( start_time.getText().toString().length() == 0 & stop_time.getText().toString().length() == 0) {
-                    Snackbar.make(v, "Enter the Start or Stop time!",
+                if ( start_time.getText().toString().length() == 0 ) {
+                    Snackbar.make(v, "Enter the start time!",
                             Snackbar.LENGTH_LONG).show();
                 }
                 else {
-                    //setting alone type to start(0) or stop(1)
-                    if(start_time.getText().toString().length() == 0 || stop_time.getText().toString().length() == 0){
-                        //setting default to start
-                        String alonetime = start_timme;
-                        int alonetype = 0;
 
-                        if(start_time.getText().toString().length() == 0){
-                            alonetype = 1;//alonetype is for stop
-                            alonetime = stop_timme;
-                        }
-
-                        DbAdd(packageInfo.packageName, alonetime, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1,alonetype);
-                        System.out.println("in event adder id for only start or stop=" + req_id);
-                        Add_Alarm(alonetime);//adding start_time for running or stopping event
-                        last_alarm = "mono";
-                    }
-                    //setting alonetype to -1 being off
-                    else{
-                    DbAdd(packageInfo.packageName, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 0, 1,-1);
+                    DbAdd(packageInfo.packageName, start_timme, monb, tueb, wedb, thub, frib, satb, sunb, 1);
                         System.out.println("in event adder id for start in runkill=" + req_id);
                     Add_Alarm(start_timme);
-                    DbAdd(packageInfo.packageName, stop_timme, monb, tueb, wedb, thub, frib, satb, sunb, 1, 1,-1);
-                        System.out.println("in event adder id for stop in run kill=" + req_id);
-                    Add_Alarm(stop_timme);
-                    last_alarm = "dual";
 
-                    }
-
-
-                    Snackbar.make(v, "Alarm Added!",
-                            Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(v, "Alarm Added!", Snackbar.LENGTH_LONG).show();
                     return_to_fragment();
                 }
             }
@@ -145,11 +114,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
                 packageList1.add(pi);
             }
         }
-       /*  int listSize = packageList1.size();
-
-       for (int i = 0; i<listSize; i++){
-            Log.i("Member name: ", packageList1.get(i).toString());
-        }*/
 
         //spinner
         Spinner apkList = (Spinner) findViewById(R.id.dynamic_spinner);
@@ -170,11 +134,7 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             }
         });
     }
-/*
-    private boolean isNeededPackage(PackageInfo pkgInfo) {
-        return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ? true : false;
 
-    }*/
 
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
@@ -194,11 +154,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             if(type.equals("start")){
                  start_timme = time_temp;
                 start_time.setText(time_12hr);
-            }
-            else{
-
-                stop_timme = time_temp;
-                stop_time.setText(time_12hr);
             }
         }catch (final ParseException e){e.printStackTrace();}
 
@@ -226,10 +181,10 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
             AlarmSet.setOnetimeTimer(getApplicationContext(),calendar,req_id);
         return true;
     }
-    private boolean DbAdd(String name,String time,int mon,int tue,int wed,int thur,int fri,int sat,int sund,int mode,int status,int alonetype){
+    private boolean DbAdd(String name,String time,int mon,int tue,int wed,int thur,int fri,int sat,int sund,int status){
 
         SqlOperator sqlOperator = new SqlOperator(getApplicationContext());
-        sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,mode,status,alonetype);
+        sqlOperator.createRecords(name,time,mon,tue,wed,thur,fri,sat,sund,status);
         req_id = sqlOperator.getNextid();
         return true;
     }
@@ -238,7 +193,6 @@ public class EventAdder extends AppCompatActivity implements TimePickerFragment.
 
         System.out.println("running onfinish");
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("passed_item", last_alarm);
         setResult(RESULT_OK,returnIntent);
         finish();
 
